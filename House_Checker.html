@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+            <meta content="width=device-width, initial-scale=1.0" name="viewport">
+                <title>
+                    House Counter-Offer
+                </title>
+                <link href="images/home.ico" rel="icon" type="image/x-icon">
+                    <link href="styles.css" rel="stylesheet">
+                    </link>
+                </link>
+            </meta>
+        </meta>
+    </head>
+    <body>
+        <!--
+TODO-
+- more feature rich
+- better structure 
+- 
+-->
+<div class="container">
+<form>
+    <label for="principal">Mortgage Amount:</label><br>
+    <input type="text" id="principal" name="principal"><br>
+    <label for="interestRate">Interest Rate (%):</label><br>
+    <input type="text" id="interestRate" name="interestRate"><br>
+    <label for="term">Mortgage Term (years):</label><br>
+    <input type="text" id="term" name="term"><br>
+    <label for="repaymentType">Repayment Type:</label><br>
+    <br>
+    <input type="submit" value="Calculate">
+  </form>
+  <div id="result"><p></p></div>
+  
+
+            <table>
+                <tr>
+                    <td>
+                        <div class="container">
+                            <!-- Asking Price -->
+                            <div class="currency-label">
+                                <label for="currency">
+                                    Asking Price
+                                </label>
+                            </div>
+                            <div class="currency-input">
+                                <input id="currency" oninput="formatCurrency(this)" type="text">
+                                </input>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <!-- Counter Offer -->
+                        <div class="currency-label">
+                            <label for="currency">
+                                Counter Offer
+                            </label>
+                        </div>
+                        <div class="currency-input">
+                            <input disabled="" id="totalPoints" type="text">
+                            </input>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="regionSelectBox">
+                            <select class="regionSelectBox" id="region">
+                                <option disabled="" selected="" value="">
+                                    Select the region of the property
+                                </option>
+                                <option id="east-england" value="east-england">
+                                    East of England
+                                </option>
+                                <option id="east-midlands" value="east-midlands">
+                                    East Midlands
+                                </option>
+                                <option id="london" value="london">
+                                    London
+                                </option>
+                                <option id="north-east" value="north-east">
+                                    North East
+                                </option>
+                                <option id="north-west" value="north-west">
+                                    North West
+                                </option>
+                                <option id="south-east" value="south-east">
+                                    South East
+                                </option>
+                                <option id="south-west" value="south-west">
+                                    South West
+                                </option>
+                                <option id="west-midlands" value="west-midlands">
+                                    West Midlands
+                                </option>
+                                <option id="yorkshire-humber" value="yorkshire-humber">
+                                    Yorkshire and The Humber
+                                </option>
+                            </select>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            <div class="scrolling-frame">
+                <!-- Garden Section -->
+                <div class="checkbox-group">
+                    <div class="checkbox-group-header">
+                        Garden
+                    </div>
+                    <div class="checkbox-row">
+                        <label for="garden1">
+                            <input id="garden1" onchange="updateTotal(this)" type="checkbox" value="1">
+                                North, East or West facing
+                            </input>
+                        </label>
+                        <label for="garden2">
+                            <input id="garden2" onchange="updateTotal(this)" type="checkbox" value="2">
+                                High maintenance garden
+                                <span class="tool-tip">
+                                    <i class="tool-tip__icon">
+                                        i
+                                    </i>
+                                    <span class="tool-tip__info">
+                                        <span class="info">
+                                            We class this as a garden that has high trees, large bushes, exotic plants etc.
+                                        </span>
+                                    </span>
+                                </span>
+                            </input>
+                        </label>
+                        <label for="garden3">
+                            <input id="garden3" onchange="updateTotal(this)" type="checkbox" value="3">
+                                Requires one off professional landscaping
+                            </input>
+                        </label>
+                        <label for="garden4">
+                            <input id="garden4" onchange="updateTotal(this)" type="checkbox" value="4">
+                                Size just not quite right
+                            </input>
+                        </label>
+                        <label for="garden5">
+                            <input id="garden5" onchange="updateTotal(this)" type="checkbox" value="5">
+                                Fencing requires replacing/work
+                            </input>
+                        </label>
+                        <label for="garden6">
+                            <input id="garden6" onchange="updateTotal(this)" type="checkbox" value="6">
+                                Rubble/Junk removal required
+                            </input>
+                        </label>
+                        <label for="garden7">
+                            <input id="garden7" onchange="updateTotal(this)" type="checkbox" value="7">
+                                No outside electric socket
+                            </input>
+                        </label>
+                        <label for="garden8">
+                            <input id="garden8" onchange="updateTotal(this)" type="checkbox" value="8">
+                                No Water outlet
+                            </input>
+                        </label>
+                    </div>
+                </div>
+                <!-- Bedrooms Section -->
+                <div class="checkbox-group rooms-group">
+                    <div class="checkbox-group-header" id="bedrooms-label">
+                        Bedrooms
+                    </div>
+                    <div class="room-select">
+                        <label for="room-count">
+                            Number of Bedrooms:
+                        </label>
+                        <select id="room-count" onchange="updateRoomCount(this)">
+                            <option disabled="" selected="" value="0">
+                                0
+                            </option>
+                            <option value="1">
+                                1
+                            </option>
+                            <option value="2">
+                                2
+                            </option>
+                            <option value="3">
+                                3
+                            </option>
+                            <option value="4">
+                                4
+                            </option>
+                            <option value="5">
+                                5
+                            </option>
+                        </select>
+                    </div>
+                    <div class="checkbox-row">
+                    </div>
+                </div>
+                <!-- Kitchen Section -->
+                <div class="checkbox-group">
+                    <div class="checkbox-group-header">
+                        Kitchen
+                    </div>
+                    <div class="checkbox-row">
+                        <label for="kitchen1">
+                            <input id="kitchen1" onchange="updateTotal(this)" type="checkbox" value="1">
+                                Full Kitchen refurbishment
+                            </input>
+                        </label>
+                        <label for="kitchen2">
+                            <input id="kitchen2" onchange="updateTotal(this)" type="checkbox" value="1">
+                                Minor Kitchen refurbishment
+                            </input>
+                        </label>
+                        <label for="kitchen3">
+                            <input id="kitchen3" onchange="updateTotal(this)" type="checkbox" value="3">
+                                Damaged Walls / Repair Required
+                            </input>
+                        </label>
+                        <label for="kitchen4">
+                            <input id="kitchen4" onchange="updateTotal(this)" type="checkbox" value="4">
+                                Damp/Mold/Dew
+                            </input>
+                        </label>
+                        <label for="kitchen5">
+                            <input id="kitchen5" onchange="updateTotal(this)" type="checkbox" value="5">
+                                Rubble/Junk removal required
+                            </input>
+                        </label>
+                        <label for="kitchen6">
+                            <input id="kitchen6" onchange="updateTotal(this)" type="checkbox" value="5">
+                                Not enough counter space
+                            </input>
+                        </label>
+                        <label for="kitchen7">
+                            <input id="kitchen7" onchange="updateTotal(this)" type="checkbox" value="5">
+                                Not enough storage
+                            </input>
+                        </label>
+                        <label for="kitchen8">
+                            <input id="kitchen8" onchange="updateTotal(this)" type="checkbox" value="5">
+                                No Dishwasher
+                            </input>
+                        </label>
+                        <label for="kitchen9">
+                            <input id="kitchen9" onchange="updateTotal(this)" type="checkbox" value="5">
+                                Textured Ceiling
+                            </input>
+                        </label>
+                        <label for="kitchen10">
+                            <input id="kitchen10" onchange="updateTotal(this)" type="checkbox" value="5">
+                                Wallpaper removal
+                            </input>
+                        </label>
+                        <label for="kitchen11">
+                            <input id="kitchen11" onchange="updateTotal(this)" type="checkbox" value="5">
+                                Windows/Frames require replacing
+                            </input>
+                        </label>
+                    </div>
+                </div>
+                <!-- Lounge Section -->
+                <div class="checkbox-group">
+                    <div class="checkbox-group-header">
+                        Lounge
+                    </div>
+                    <div class="checkbox-row">
+                        <label for="lounge1">
+                            <input id="lounge1" onchange="updateTotal(this)" type="checkbox" value="1">
+                                Full Lounge refurbishment
+                            </input>
+                        </label>
+                        <label for="lounge2">
+                            <input id="lounge2" onchange="updateTotal(this)" type="checkbox" value="1">
+                                Minor Lounge refurbishment
+                            </input>
+                        </label>
+                        <label for="lounge3">
+                            <input id="lounge3" onchange="updateTotal(this)" type="checkbox" value="3">
+                                Damaged Walls / Repair Required
+                            </input>
+                        </label>
+                        <label for="lounge4">
+                            <input id="lounge4" onchange="updateTotal(this)" type="checkbox" value="4">
+                                Damp/Mold/Dew
+                            </input>
+                        </label>
+                        <label for="lounge5">
+                            <input id="lounge5" onchange="updateTotal(this)" type="checkbox" value="5">
+                                Repaint required
+                            </input>
+                        </label>
+                        <label for="lounge6">
+                            <input id="lounge6" onchange="updateTotal(this)" type="checkbox" value="5">
+                                Damage
+                            </input>
+                        </label>
+                        <label for="lounge7">
+                            <input id="lounge7" onchange="updateTotal(this)" type="checkbox" value="5">
+                                Textured Ceiling
+                            </input>
+                        </label>
+                        <label for="lounge8">
+                            <input id="lounge8" onchange="updateTotal(this)" type="checkbox" value="5">
+                                Wallpaper removal
+                            </input>
+                        </label>
+                        <label for="lounge9">
+                            <input id="lounge9" onchange="updateTotal(this)" type="checkbox" value="5">
+                                Windows/Frames require replacing
+                            </input>
+                        </label>
+                        <label for="lounge10">
+                            <input id="lounge10" onchange="updateTotal(this)" type="checkbox" value="5">
+                                Fireplace/Log burner requires cleaning
+                            </input>
+                        </label>
+                    </div>
+                </div>
+                <!-- Toilet Section -->
+                <div class="checkbox-group">
+                    <div class="checkbox-group-header">
+                        Toilet
+                    </div>
+                    <div class="checkbox-row">
+                        <label for="toilet1">
+                            <input id="toilet1" onchange="updateTotal(this)" type="checkbox" value="1">
+                                Full Toilet refurbishment
+                            </input>
+                        </label>
+                        <label for="toilet2">
+                            <input id="toilet2" onchange="updateTotal(this)" type="checkbox" value="1">
+                                Minor Toilet refurbishment
+                            </input>
+                        </label>
+                        <label for="toilet3">
+                            <input id="toilet3" onchange="updateTotal(this)" type="checkbox" value="3">
+                                Damaged Walls / Repair Required
+                            </input>
+                        </label>
+                        <label for="toilet4">
+                            <input id="toilet4" onchange="updateTotal(this)" type="checkbox" value="4">
+                                Damp/Mold/Dew
+                            </input>
+                        </label>
+                        <label for="toilet5">
+                            <input id="toilet5" onchange="updateTotal(this)" type="checkbox" value="5">
+                                Repaint required
+                            </input>
+                        </label>
+                        <label for="toilet6">
+                            <input id="toilet6" onchange="updateTotal(this)" type="checkbox" value="5">
+                                Damage
+                            </input>
+                        </label>
+                        <label for="toilet7">
+                            <input id="toilet7" onchange="updateTotal(this)" type="checkbox" value="5">
+                                Textured Ceiling
+                            </input>
+                        </label>
+                        <label for="toilet8">
+                            <input id="toilet8" onchange="updateTotal(this)" type="checkbox" value="5">
+                                Wallpaper removal
+                            </input>
+                        </label>
+                        <label for="toilet9">
+                            <input id="toilet9" onchange="updateTotal(this)" type="checkbox" value="5">
+                                No Shower
+                            </input>
+                        </label>
+                        <label for="toilet10">
+                            <input id="toilet10" onchange="updateTotal(this)" type="checkbox" value="5">
+                                Poor/No Ventilation
+                            </input>
+                        </label>
+                        <label for="toilet11">
+                            <input id="toilet11" onchange="updateTotal(this)" type="checkbox" value="5">
+                                Windows/Frames require replacing
+                            </input>
+                        </label>
+                    </div>
+                </div>
+                <!-- Loft Section -->
+                <div class="checkbox-group">
+                    <div class="checkbox-group-header">
+                        Loft
+                    </div>
+                    <div class="checkbox-row">
+                        <label for="loft1">
+                            <input id="loft1" onchange="updateTotal(this)" type="checkbox" value="1">
+                                No insulation
+                            </input>
+                        </label>
+                        <label for="loft2">
+                            <input id="loft2" onchange="updateTotal(this)" type="checkbox" value="1">
+                                Not boarded for storage
+                            </input>
+                        </label>
+                        <label for="loft3">
+                            <input id="loft3" onchange="updateTotal(this)" type="checkbox" value="2">
+                                No access ladder
+                            </input>
+                        </label>
+                    </div>
+                </div>
+                <!-- Stairwell/hallway Section -->
+                <div class="checkbox-group">
+                    <div class="checkbox-group-header">
+                        Stairs/Stairwell/Hallway
+                    </div>
+                    <div class="checkbox-row">
+                        <label for="stairwell1">
+                            <input id="stairwell1" onchange="updateTotal(this)" type="checkbox" value="1">
+                                Stairs require work
+                            </input>
+                        </label>
+                        <label for="stairwell2">
+                            <input id="stairwell2" onchange="updateTotal(this)" type="checkbox" value="3">
+                                Damaged Walls / Repair Required
+                            </input>
+                        </label>
+                        <label for="stairwell3">
+                            <input id="stairwell3" onchange="updateTotal(this)" type="checkbox" value="4">
+                                Damp/Mold/Dew
+                            </input>
+                        </label>
+                        <label for="stairwell4">
+                            <input id="stairwell4" onchange="updateTotal(this)" type="checkbox" value="5">
+                                Repaint required
+                            </input>
+                        </label>
+                        <label for="stairwell5">
+                            <input id="stairwell5" onchange="updateTotal(this)" type="checkbox" value="5">
+                                Textured Ceiling
+                            </input>
+                        </label>
+                        <label for="stairwell6">
+                            <input id="stairwell6" onchange="updateTotal(this)" type="checkbox" value="5">
+                                Wallpaper removal
+                            </input>
+                        </label>
+                        <label for="stairwell7">
+                            <input id="stairwell7" onchange="updateTotal(this)" type="checkbox" value="5">
+                                Windows/Frames require replacing
+                            </input>
+                        </label>
+                    </div>
+                </div>
+                <!-- Exterior -->
+                <div class="checkbox-group">
+                    <div class="checkbox-group-header">
+                        House Exterior
+                    </div>
+                    <div class="checkbox-row">
+                        <label for="exterior1">
+                            <input id="exterior1" onchange="updateTotal(this)" type="checkbox" value="1">
+                                Facias require replacing
+                            </input>
+                        </label>
+                        <label for="exterior2">
+                            <input id="exterior2" onchange="updateTotal(this)" type="checkbox" value="3">
+                                Damaged Roof / Repair Required
+                            </input>
+                        </label>
+                        <label for="exterior3">
+                            <input id="exterior3" onchange="updateTotal(this)" type="checkbox" value="4">
+                                Damp/Mold/Dew
+                            </input>
+                        </label>
+                        <label for="exterior4">
+                            <input id="exterior4" onchange="updateTotal(this)" type="checkbox" value="5">
+                                Repaint required
+                            </input>
+                        </label>
+                        <label for="exterior5">
+                            <input id="exterior5" onchange="updateTotal(this)" type="checkbox" value="5">
+                                No Driveway
+                            </input>
+                        </label>
+                        <label for="exterior6">
+                            <input id="exterior6" onchange="updateTotal(this)" type="checkbox" value="5">
+                                Driveway too small for required cars
+                            </input>
+                        </label>
+                    </div>
+                </div>
+                <!-- Exterior -->
+                <div class="checkbox-group">
+                    <div class="checkbox-group-header">
+                        House General
+                    </div>
+                    <div class="checkbox-row">
+                        <label for="general1">
+                            <input id="general1" onchange="updateTotal(this)" type="checkbox" value="1">
+                                Boiler outdated/no service history
+                            </input>
+                        </label>
+                        <label for="general2">
+                            <input id="general2" onchange="updateTotal(this)" type="checkbox" value="3">
+                                Electrics require replacing
+                            </input>
+                        </label>
+                        <label for="general3">
+                            <input id="general3" onchange="updateTotal(this)" type="checkbox" value="4">
+                                No Central Heating
+                            </input>
+                        </label>
+                        <label for="general4">
+                            <input id="general4" onchange="updateTotal(this)" type="checkbox" value="5">
+                                Rising Damp Symptoms
+                            </input>
+                        </label>
+                        <label for="general5">
+                            <input id="general5" onchange="updateTotal(this)" type="checkbox" value="5">
+                                Poor EPC Rating (C or above)
+                            </input>
+                        </label>
+                    </div>
+                </div>
+
+        <script src="script.js">
+        </script>
+
+
+<script>
+const form = document.querySelector('form');
+form.addEventListener('submit', function(event) {
+  event.preventDefault();
+  const principal = parseFloat(document.querySelector('#principal').value);
+  const interestRate = parseFloat(document.querySelector('#interestRate').value);
+  const term = parseInt(document.querySelector('#term').value);
+
+  let interestPayment, capitalPayment;
+
+   const monthlyInterestRate = (interestRate / 100) / 12;
+    const numberOfPayments = term * 12;
+    interestPayment = principal * (interestRate / 100) / 12;
+    capitalPayment = (principal * monthlyInterestRate) / (1 - Math.pow(1 + monthlyInterestRate, -numberOfPayments));
+
+  document.querySelector('#result').innerHTML = `<p>Interest Payment: £ ${interestPayment.toFixed(2)}</p>`;
+  document.querySelector('#result').innerHTML += `<p>Capital Payment: £ ${capitalPayment.toFixed(2)}</p>`;
+});
+  </script>
+
+
+    </body>
+</html>

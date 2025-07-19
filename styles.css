@@ -1,0 +1,316 @@
+
+/*
+TODO: 
+- this is just a mess, streamline it
+*/
+
+
+
+table td:nth-child(1) {
+padding-left: 10px;;
+}
+
+table td:nth-child(2) {
+padding-left: 20px;
+}
+
+
+tr:last-child td {
+border-bottom: 1px dotted black;  
+}
+
+
+tr:last-child td:last-child {
+border-right: none; 
+}
+body {
+
+  background-color: #262626;
+  color:#ffffff;
+  font-family:"Helvetica Neue", Helvetica, Arial, sans-serif;
+
+}
+
+
+.container {
+max-width: 650px;
+margin: 0 auto;
+padding: 1px;
+
+}
+
+.currency-input {
+position: relative;
+display: block;
+font-size: 1.5rem;
+padding-left: 10px;
+border: 1px solid #ccc;
+border-radius: 5px;
+background-color: #f9f9f9;
+margin-bottom: 0px;
+}
+
+.currency-input::before {
+content: "£";
+position: absolute;
+left: 10px;
+top: 50%;
+transform: translateY(-50%);
+color: #666;
+}
+
+.currency-input input {
+padding: 1px;
+border: none;
+background: transparent;
+font-size: inherit;
+width: 100%;
+box-sizing: border-box;
+}
+
+/*frame around the house sections */
+.checkbox-group {
+margin-bottom: 10px;
+border: 2px solid #ccc;
+border-radius: 10px;
+padding: 10px;
+display: block;
+}
+
+/*Header name for each section */
+.checkbox-group-header {
+font-weight: bold;
+margin-bottom: 10px;
+}
+
+
+.checkbox-row label {
+
+display: block;
+}
+
+.currency-input.error {
+border: 5px solid red;
+}
+
+.currency-input.error::placeholder {
+color: red;
+
+}
+.room-frame {
+border: 2px solid #ccc;
+border-radius: 5px;
+padding: 1px;
+margin-bottom: 10px;
+display: inline-block;
+width: 48%; 
+margin-right: 2%; 
+
+}
+
+.room-label {
+font-weight: bold;
+margin-bottom: 5px;
+}
+
+.checkbox-row {
+margin-top: 10px;
+}
+
+.checkbox-row input[type="checkbox"] {
+margin-right: 5px;
+}
+.room-grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+gap: 20px;
+}
+
+.room-frame {
+border: 2px solid #ccc;
+border-radius: 5px;
+padding: 10px;
+width: max-content; /* accommodate longest text */
+}
+
+.room-label {
+font-weight: bold;
+margin-bottom: 5px;
+}
+
+
+.checkbox-row input[type="checkbox"] {
+margin-right: 5px;
+}
+
+.currency-input input[type="text"] {
+width: 200px; /
+max-width: 100%; 
+box-sizing: border-box; 
+}
+
+.currency-input {
+display: inline-flex; 
+align-items: center; 
+font-size: 20px; 
+padding-left: 30px; 
+
+}
+
+.currency-input label {
+margin-right: 10px; 
+width: 100%; 
+font-size: 40px;
+}
+.currency-label label {
+margin-right: 0px; 
+width: 10%; 
+font-size: 40px;
+margin-left: 0px;
+padding-left: 0px;
+}
+
+.content {
+display: flex;
+flex-direction: column;
+height: 100vh;
+margin-top: 0;
+}
+
+
+.scrolling-frame {
+max-height: calc(100vh - 150px); 
+overflow-y: auto; 
+border-top: 2px solid #ccc; 
+border-bottom: 2px solid #ccc;; 
+border-radius: 10px;
+margin-top: 0px;
+margin-bottom: 0px;
+}
+
+
+
+table {
+border-collapse: collapse; 
+width: 100%; 
+}
+
+td {
+border-left: none; 
+border-right: 2px solid #ccc; 
+
+padding: 8px; 
+text-align: left; 
+}
+
+td:last-child {
+border-right: none; 
+
+}
+
+
+
+.regionSelectBox {
+max-width: 300px; /* Limit width of region select box */
+padding-left: 19px;
+margin-bottom: 2px;
+}
+
+
+/************** Tool Tip Styles ********************************/
+.tool-tip {
+  display: inline-block;
+  position: relative;
+  margin-left: 0.5em;
+}
+.tool-tip .tool-tip__icon {
+  background: #27b1f0;
+  border-radius: 10px;
+  cursor: pointer;
+  display: inline-block;
+  font-style: italic;
+  font-family: times new roman;
+  height: 20px;
+  line-height: 1.3em;
+  text-align: center;
+  width: 20px;
+}
+.tool-tip .tool-tip__info {
+  display: none;
+  background: #262626;
+  border: 1px solid #27b1f0;
+  border-radius: 3px;
+  font-size: 0.875em;
+  padding: 1em;
+  position: absolute;
+  left: 30px;
+  top: -20px;
+  width: 250px;
+  z-index: 2;
+}
+.tool-tip .tool-tip__info:before, .tool-tip .tool-tip__info:after {
+  content: "";
+  position: absolute;
+  left: -10px;
+  top: 7px;
+  border-style: solid;
+  border-width: 10px 10px 10px 0;
+  border-color: transparent #27b1f0;
+}
+.tool-tip .tool-tip__info:after {
+  left: -8px;
+  border-right-color: #262626;
+}
+.tool-tip .tool-tip__info .info {
+  display: block;
+}
+.tool-tip .tool-tip__info .info__title {
+  color: #fa00f3;
+}
+.tool-tip:hover .tool-tip__info, .tool-tip:focus .tool-tip__info {
+  display: inline-block;
+}
+
+a:focus + .tool-tip .tool-tip__info {
+  display: inline-block;
+}
+
+/******* Styles just to make it look a little better ******
+body{
+  background-color: #262626;
+  color:#ffffff;
+  font-family:"Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+article{
+  background: #414141;
+  border-radius: 5px;
+  padding: 1em;
+  margin: 1em;
+}
+i{
+  font-style: normal;
+}
+a{
+  color: white;
+  text-decoration: none;
+}
+a:hover,
+a:focus{
+  text-decoration: underline;
+}
+li{
+  margin: 5px 0;
+}
+*/
+
+/* Hide tooltip content by default */
+.tool-tip__info {
+  display: none;
+}
+
+/* Show tooltip content when tooltip trigger is hovered over or focused */
+.tool-tip:hover .tool-tip__info,
+.tool-tip:focus-within .tool-tip__info {
+  display: block;
+}
+
