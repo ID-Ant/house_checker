@@ -116,12 +116,6 @@ img {
   transform: translateX(0);
 }
 
-@media (max-width: 1160px) {
-  .market-float {
-    display: none;
-  }
-}
-
 .panel {
   background: var(--panel-bg);
   border-radius: 16px;
@@ -657,20 +651,81 @@ input[type="text"]:focus {
   display: block;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 1024px) {
+  .panel--offer {
+    top: -0.25rem;
+  }
+
+  .market-float {
+    left: 0.25rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-header {
+    padding: 1.75rem 1rem 2.25rem;
+    text-align: left;
+  }
+
+  .app-shell {
+    margin: -2rem auto 1.25rem;
+    padding: 0 0.75rem;
+  }
+
   .panel {
-    padding: 1.5rem;
+    padding: 1.15rem;
   }
 
   .panel--offer {
-    top: 0.5rem;
+    position: static;
+    top: auto;
   }
 
   .offer-grid {
     grid-template-columns: 1fr;
+    gap: 1rem;
   }
 
   .checkbox-row {
     grid-template-columns: 1fr;
+  }
+
+  .condition-scroller {
+    max-height: none;
+    padding-right: 0;
+  }
+
+  .rooms-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .market-float {
+    top: auto;
+    bottom: 1rem;
+    left: 1rem;
+    right: 1rem;
+    width: auto;
+    flex-direction: row;
+    gap: 0.65rem;
+    transform: translateY(30px);
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+  }
+
+  .market-float.is-visible {
+    transform: translateY(0);
+  }
+
+  .market-float .metric-card {
+    min-width: 180px;
+    flex: 0 0 auto;
+  }
+
+  .metric-value {
+    font-size: 1.2rem;
+  }
+
+  .metric-meta {
+    font-size: 0.82rem;
   }
 }
