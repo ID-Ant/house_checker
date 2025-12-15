@@ -11,48 +11,73 @@
     <header class="app-header">
       <div class="app-header__content">
         <p class="eyebrow">House Checker</p>
-        <h1>House hunting can feel like juggling paint cans while riding a roller coaster—what even is a fair offer?</h1>
-        <p>We built this playful helper to keep the ride fun and shake the guesswork out.</p>
+        <h1><span class="headline-highlight">What is a fair price?</span></h1>
+        <p class="disclaimer">Heads up: this is illustrative guidance only and not financial advice.</p>
      <br>
       </div>
     </header>
     <main class="app-shell">
-      <!-- <section class="panel panel--finance">
+      <section class="panel panel--market" id="market-panel">
         <div class="panel__heading">
-          <p class="eyebrow">Mortgage snapshot</p>
-          <h2>Check affordability quickly</h2>
-          <p>Use the calculator for a rough guide before negotiating. <strong class="alert-inline">Illustration only, not financial advice.</strong></p>
+          <p class="eyebrow">Market pulse</p>
+          <h2>Compare with Land Registry averages</h2>
+          <p>See how your asking or counter offer stacks up against the latest HM Land Registry snapshot.</p>
         </div>
-        <form class="mortgage-form" id="mortgage-form" novalidate>
-          <div class="form-grid">
+        <div class="market-overlay" id="market-overlay">
+          <div class="market-type-select">
             <div class="field-block">
-              <label class="input-label" for="principal">Mortgage Amount</label>
-              <div class="input-with-prefix">
-                <span class="input-prefix" aria-hidden="true">£</span>
-                <input class="input-control" id="principal" name="principal" placeholder="e.g. 250000" type="text" inputmode="numeric" autocomplete="off">
+              <label class="input-label" for="region">Select the Region of the Property</label>
+              <select class="input-control" id="region">
+                <option value="" selected disabled>Select the region of the property</option>
+                <option value="east-england">East of England</option>
+                <option value="east-midlands">East Midlands</option>
+                <option value="london">London</option>
+                <option value="north-east">North East</option>
+                <option value="north-west">North West</option>
+                <option value="south-east">South East</option>
+                <option value="south-west">South West</option>
+                <option value="west-midlands">West Midlands</option>
+                <option value="yorkshire-humber">Yorkshire and The Humber</option>
+              </select>
+            </div>
+            <div class="field-block">
+              <label class="input-label" for="property-type">Property type</label>
+              <select id="property-type" class="input-control">
+                <option value="all" selected>All properties</option>
+                <option value="detached">Detached</option>
+                <option value="semi-detached">Semi-detached</option>
+                <option value="terraced">Terraced</option>
+                <option value="flat">Flat/Maisonette</option>
+              </select>
+            </div>
+          </div>
+          <p class="helper-text market-helper">Regional weights use HM Land Registry averages.</p>
+          <div class="market-overlay__status" id="market-status">Select a region to fetch market data.</div>
+          <div class="market-metrics is-hidden" id="market-metrics">
+            <div class="metric-card">
+              <p class="metric-label">Latest average</p>
+              <p class="metric-value" id="market-latest">—</p>
+              <p class="metric-meta" id="market-change">—</p>
+            </div>
+            <div class="metric-card metric-card--delta" id="market-asking-card">
+              <div class="metric-card__header">
+                <p class="metric-label">Vs asking</p>
+                <span class="metric-chip metric-chip--neutral" id="market-asking-chip" aria-live="polite">—</span>
               </div>
+              <p class="metric-value" id="market-vs-asking">—</p>
+              <p class="metric-meta" id="market-asking-meta">—</p>
             </div>
-            <div class="field-block">
-              <label class="input-label" for="interestRate">Interest Rate (%)</label>
-              <input class="input-control" id="interestRate" name="interestRate" placeholder="4.85" type="text" inputmode="decimal" autocomplete="off">
-            </div>
-            <div class="field-block">
-              <label class="input-label" for="term">Mortgage Term (years)</label>
-              <input class="input-control" id="term" name="term" placeholder="25" type="text" inputmode="numeric" autocomplete="off">
+            <div class="metric-card metric-card--delta" id="market-counter-card">
+              <div class="metric-card__header">
+                <p class="metric-label">Vs counter offer</p>
+                <span class="metric-chip metric-chip--neutral" id="market-counter-chip" aria-live="polite">—</span>
+              </div>
+              <p class="metric-value" id="market-vs-counter">—</p>
+              <p class="metric-meta" id="market-counter-meta">—</p>
             </div>
           </div>
-          <div class="field-block">
-            <label class="input-label" for="repaymentType">Repayment Type</label>
-            <select class="input-control" id="repaymentType" name="repaymentType">
-              <option value="repayment">Repayment</option>
-              <option value="interest-only">Interest only</option>
-            </select>
-          </div>
-          <button class="btn btn--primary" type="submit">Calculate</button>
-        </form>
-        <div class="alert alert--muted is-hidden" id="mortgage-status" role="status" aria-live="polite"></div>
-        <div class="mortgage-result" id="result" aria-live="polite"></div>
-      </section> -->
+        </div>
+      </section>
 
       <section class="panel panel--offer">
         <div class="panel__heading deductible-heading">
@@ -75,21 +100,6 @@
               <input id="totalPoints" type="text" disabled>
             </div>
             <p class="helper-text">Automatically updates as you select issues.</p>
-          </div>
-          <div class="field-block">
-            <label class="input-label" for="region">Select the Region of the Property</label>
-            <select class="input-control" id="region">
-              <option value="" selected disabled>Select the region of the property</option>
-              <option id="east-england" value="east-england">East of England</option>
-              <option id="east-midlands" value="east-midlands">East Midlands</option>
-              <option id="london" value="london">London</option>
-              <option id="north-east" value="north-east">North East</option>
-              <option id="north-west" value="north-west">North West</option>
-              <option id="south-east" value="south-east">South East</option>
-              <option id="south-west" value="south-west">South West</option>
-              <option id="west-midlands" value="west-midlands">West Midlands</option>
-              <option id="yorkshire-humber" value="yorkshire-humber">Yorkshire and The Humber</option>
-            </select>
           </div>
         </div>
         <div class="alert alert--muted is-hidden" id="offer-status" role="status" aria-live="polite"></div>
@@ -242,6 +252,30 @@
         </div>
       </section>
     </main>
+
+    <div class="market-float" id="market-float" aria-live="polite">
+      <div class="metric-card metric-card--compact">
+        <p class="metric-label">Latest average</p>
+        <p class="metric-value" id="market-latest-floating">—</p>
+        <p class="metric-meta" id="market-change-floating">—</p>
+      </div>
+      <div class="metric-card metric-card--delta metric-card--compact" id="market-asking-card-floating">
+        <div class="metric-card__header">
+          <p class="metric-label">Vs asking</p>
+          <span class="metric-chip metric-chip--neutral" id="market-asking-chip-floating">—</span>
+        </div>
+        <p class="metric-value" id="market-vs-asking-floating">—</p>
+        <p class="metric-meta" id="market-asking-meta-floating">—</p>
+      </div>
+      <div class="metric-card metric-card--delta metric-card--compact" id="market-counter-card-floating">
+        <div class="metric-card__header">
+          <p class="metric-label">Vs counter offer</p>
+          <span class="metric-chip metric-chip--neutral" id="market-counter-chip-floating">—</span>
+        </div>
+        <p class="metric-value" id="market-vs-counter-floating">—</p>
+        <p class="metric-meta" id="market-counter-meta-floating">—</p>
+      </div>
+    </div>
 
     <script src="script.js"></script>
     <script src="Main/script_main.js"></script>

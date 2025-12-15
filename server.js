@@ -33,6 +33,13 @@ Object.keys(REGION_LOCATIONS).forEach((key) => {
 
 const DEFAULT_LOCATION = REGION_LOCATIONS['north-east'];
 const ALLOWED_LOCATION_URLS = new Set(Object.values(REGION_LOCATIONS));
+const PROPERTY_TYPE_FACTORS = {
+  detached: 1.15,
+  'semi-detached': 1.05,
+  terraced: 0.95,
+  flat: 0.85,
+  all: 1
+};
 
 const FETCH_HEADERS = {
   'user-agent': 'HouseChecker/1.0 (+https://github.com/)'
@@ -166,6 +173,58 @@ async function persistData(records) {
   await fs.writeFile(DATA_FILE, json, 'utf8');
 }
 
+function extractNumericField(record) {
+  if (!record) return { key: null, value: null };
+  const preferredKey =
+    Object.keys(record).find((key) => /average/i.test(key) && /price/i.test(key)) ||
+    Object.keys(record).find((key) => /average/i.test(key)) ||
+    Object.keys(record).find((key) => /price/i.test(key));
+  const key = preferredKey || Object.keys(record)[1];
+  const value = key ? toCurrencyNumber(record[key]) : null;
+  return { key, value };
+}
+
+function toCurrencyNumber(value) {
+  if (value == null) return null;
+  const numeric = Number(String(value).replace(/[^0-9.-]/g, ''));
+  return Number.isFinite(numeric) ? numeric : null;
+}
+
+function summariseMarket(records, multiplier = 1) {
+  if (!Array.isArray(records) || !records.length) {
+    return null;
+  }
+  let fieldKey = null;
+  const series = records
+    .map((record, index) => {
+      const { key, value } = extractNumericField(record);
+      if (!fieldKey && key) fieldKey = key;
+      return {
+        label: record.Period || record.Month || record.Date || `Point ${index + 1}`,
+        value: Number.isFinite(value) ? value * multiplier : null
+      };
+    })
+    .filter((entry) => Number.isFinite(entry.value));
+
+  if (!series.length) return null;
+
+  const values = series.map((entry) => entry.value);
+  const latest = series[0].value;
+  const earliest = series[series.length - 1].value;
+  const average = values.reduce((sum, value) => sum + value, 0) / values.length;
+  const changePercent = earliest ? ((latest - earliest) / earliest) * 100 : null;
+
+  return {
+    field: fieldKey,
+    latestPrice: Math.round(latest),
+    averagePrice: Math.round(average),
+    minPrice: Math.round(Math.min(...values)),
+    maxPrice: Math.round(Math.max(...values)),
+    changePercent: changePercent != null ? Number(changePercent.toFixed(2)) : null,
+    timeline: series.slice(0, 12)
+  };
+}
+
 app.get('/api/ukhpi', async (req, res, next) => {
   try {
     const { from: defaultFrom, to: defaultTo } = defaultRange();
@@ -208,6 +267,39 @@ app.use((req, res, next) => {
 app.use((err, req, res, next) => {
   console.error(err);
   res.status(500).json({ error: err.message || 'Unexpected server error' });
+});
+
+app.get('/api/market', async (req, res, next) => {
+  try {
+    const { from: defaultFrom, to: defaultTo } = defaultRange();
+    const sanitizedFrom = sanitizeDate(req.query.from, defaultFrom);
+    const sanitizedTo = sanitizeDate(req.query.to, defaultTo);
+    const { from, to } = normalizeDateRange(sanitizedFrom, sanitizedTo);
+    const resolvedLocation = normalizeLocation(req.query.location);
+    const propertyType = String(req.query.type || 'all').toLowerCase();
+    const typeFactor = PROPERTY_TYPE_FACTORS[propertyType] || PROPERTY_TYPE_FACTORS.all;
+
+    if (!resolvedLocation.ok) {
+      return res.status(400).json({ error: 'Unsupported location parameter' });
+    }
+
+    const result = await fetchUkhpi({ from, to, location: resolvedLocation.value });
+    const summary = summariseMarket(result.records, typeFactor);
+
+    res.json({
+      summary,
+      metadata: {
+        source: result.url,
+        fetchedAt: new Date().toISOString(),
+        from,
+        to,
+        location: resolvedLocation.value,
+        propertyType
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
 });
 
 function normalizeLocation(rawLocation) {

@@ -1,13 +1,45 @@
 let sectionWeights = null;
 let offerStatusTimer;
+let marketSummary = null;
 
 const STATUS_VISIBILITY_MS = 5000;
 const currencyInput = document.getElementById('currency');
 const totalPointsInput = document.getElementById('totalPoints');
 const regionSelect = document.getElementById('region');
 const offerStatusBox = document.getElementById('offer-status');
+const marketStatusBox = document.getElementById('market-status');
+const marketMetricsBox = document.getElementById('market-metrics');
+const collectTargets = (...ids) => ids.map((id) => document.getElementById(id)).filter(Boolean);
+const marketLatestEls = collectTargets('market-latest', 'market-latest-floating');
+const marketChangeEls = collectTargets('market-change', 'market-change-floating');
+const marketVsAskingEls = collectTargets('market-vs-asking', 'market-vs-asking-floating');
+const marketAskingMetaEls = collectTargets('market-asking-meta', 'market-asking-meta-floating');
+const marketVsCounterEls = collectTargets('market-vs-counter', 'market-vs-counter-floating');
+const marketCounterMetaEls = collectTargets('market-counter-meta', 'market-counter-meta-floating');
+const marketAskingCards = collectTargets('market-asking-card', 'market-asking-card-floating');
+const marketCounterCards = collectTargets('market-counter-card', 'market-counter-card-floating');
+const marketAskingChips = collectTargets('market-asking-chip', 'market-asking-chip-floating');
+const marketCounterChips = collectTargets('market-counter-chip', 'market-counter-chip-floating');
+const marketFloatPanel = document.getElementById('market-float');
+const offerPanel = document.querySelector('.panel--offer');
+const propertyTypeSelect = document.getElementById('property-type');
+
+const REGION_LOCATIONS_CLIENT = {
+  'north-east': 'http://landregistry.data.gov.uk/id/region/north-east',
+  'north-west': 'http://landregistry.data.gov.uk/id/region/north-west',
+  'east-england': 'http://landregistry.data.gov.uk/id/region/east-of-england',
+  'east-midlands': 'http://landregistry.data.gov.uk/id/region/east-midlands',
+  london: 'http://landregistry.data.gov.uk/id/region/london',
+  'south-east': 'http://landregistry.data.gov.uk/id/region/south-east',
+  'south-west': 'http://landregistry.data.gov.uk/id/region/south-west',
+  'west-midlands': 'http://landregistry.data.gov.uk/id/region/west-midlands',
+  'yorkshire-humber': 'http://landregistry.data.gov.uk/id/region/yorkshire-and-the-humber'
+};
 const conditionList = document.getElementById('deduction-list');
 const customWeights = {};
+let hasScrolledPastOffer = false;
+let hasScrolledWithinChecklist = false;
+let offerScrollThreshold = 0;
 
 const deductionFormatter = new Intl.NumberFormat('en-GB', {
   style: 'currency',
@@ -123,11 +155,54 @@ const REGION_WEIGHTS = Object.keys(REGION_FACTORS).reduce((acc, regionKey) => {
   return acc;
 }, {});
 
+function updateTextContent(targets, value) {
+  targets.forEach((element) => {
+    if (element) {
+      element.textContent = value;
+    }
+  });
+}
+
+function computeElementPageOffset(element) {
+  let offset = 0;
+  let node = element;
+  while (node) {
+    offset += node.offsetTop || 0;
+    node = node.offsetParent;
+  }
+  return offset;
+}
+
+function refreshOfferScrollThreshold() {
+  if (!offerPanel) {
+    offerScrollThreshold = Number.POSITIVE_INFINITY;
+    return;
+  }
+  offerScrollThreshold = computeElementPageOffset(offerPanel) + offerPanel.offsetHeight;
+}
+
+function updateOfferScrollState() {
+  if (!offerPanel) return;
+  const scrollTop = window.pageYOffset || document.documentElement.scrollTop || 0;
+  hasScrolledPastOffer = scrollTop > offerScrollThreshold;
+  syncMarketFloatVisibility();
+}
+
+function updateChecklistScrollState() {
+  if (!conditionList) return;
+  const scrolled = conditionList.scrollTop > 40;
+  if (scrolled !== hasScrolledWithinChecklist) {
+    hasScrolledWithinChecklist = scrolled;
+    syncMarketFloatVisibility();
+  }
+}
+
 function formatCurrency(input) {
   if (!input) return;
   const sanitized = input.value.replace(/[^0-9.]/g, '').replace(/^0+/, '');
   const parsedValue = parseFloat(sanitized);
   input.value = Number.isFinite(parsedValue) ? parsedValue.toLocaleString('en-GB') : '';
+  updateMarketOverlayComparison();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -136,6 +211,13 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   refreshDeductionPills();
   setupPillEditing();
+  if (propertyTypeSelect) {
+    propertyTypeSelect.addEventListener('change', () => {
+      if (sectionWeights) {
+        loadMarketOverlay(regionSelect?.value);
+      }
+    });
+  }
 });
 
 function setOfferStatus(message, tone = 'info', persist = false) {
@@ -157,6 +239,22 @@ function setOfferStatus(message, tone = 'info', persist = false) {
     offerStatusTimer = setTimeout(() => {
       setOfferStatus('');
     }, STATUS_VISIBILITY_MS);
+  }
+}
+
+function setMarketStatus(message, isError = false) {
+  if (!marketStatusBox || !marketMetricsBox) return;
+  marketStatusBox.textContent = message;
+  marketStatusBox.classList.toggle('is-error', Boolean(isError));
+  marketMetricsBox.classList.add('is-hidden');
+}
+
+function syncMarketFloatVisibility() {
+  if (!marketFloatPanel) return;
+  if (hasScrolledPastOffer || hasScrolledWithinChecklist) {
+    marketFloatPanel.classList.add('is-visible');
+  } else {
+    marketFloatPanel.classList.remove('is-visible');
   }
 }
 
@@ -250,6 +348,8 @@ function handleRegionSelection() {
     resetAllCheckboxes();
     if (totalPointsInput) totalPointsInput.value = '';
     refreshDeductionPills();
+    marketSummary = null;
+    setMarketStatus('Select a region to fetch market data.');
     return;
   }
 
@@ -260,12 +360,15 @@ function handleRegionSelection() {
     resetAllCheckboxes();
     if (totalPointsInput) totalPointsInput.value = '';
     refreshDeductionPills();
+    marketSummary = null;
+    setMarketStatus(`${regionLabel} market data is not available yet.`);
     return;
   }
 
   sectionWeights = weights;
   setOfferStatus(`Weights loaded for ${regionLabel}.`, 'success');
   refreshDeductionPills();
+  loadMarketOverlay(regionValue);
   updateTotal();
 }
 
@@ -319,6 +422,8 @@ function updateTotal() {
   } else {
     setOfferStatus('Offer updated with the selected works.', 'success');
   }
+
+  updateMarketOverlayComparison();
 }
 
 function updateRoomCount(select) {
@@ -459,6 +564,156 @@ function parseDeductionInput(value) {
   return Number.isFinite(numeric) ? Math.abs(numeric) : NaN;
 }
 
+async function loadMarketOverlay(regionValue) {
+  if (!REGION_LOCATIONS_CLIENT[regionValue]) {
+    setMarketStatus('Select a region to fetch market data.');
+    marketSummary = null;
+    return;
+  }
+  try {
+    setMarketStatus('Loading market data…');
+    marketSummary = null;
+    const params = new URLSearchParams({
+      location: REGION_LOCATIONS_CLIENT[regionValue],
+      type: propertyTypeSelect?.value || 'all'
+    });
+    const response = await fetch(`/api/market?${params.toString()}`);
+    if (!response.ok) {
+      throw new Error('Failed to load market data');
+    }
+    const payload = await response.json();
+    marketSummary = payload.summary || null;
+    if (!marketSummary) {
+      setMarketStatus('No market summary available for this region.');
+      return;
+    }
+    renderMarketOverlay();
+    updateMarketOverlayComparison();
+  } catch (error) {
+    console.error(error);
+    setMarketStatus('Could not load market data. Please try again later.', true);
+  }
+}
+
+function renderMarketOverlay() {
+  if (!marketSummary || !marketMetricsBox || !marketStatusBox) return;
+  marketStatusBox.textContent = '';
+  marketMetricsBox.classList.remove('is-hidden');
+  updateTextContent(marketLatestEls, formatCurrencyForDisplay(marketSummary.latestPrice));
+  const changeLabel =
+    marketSummary.changePercent != null
+      ? `${marketSummary.changePercent > 0 ? '+' : ''}${marketSummary.changePercent.toFixed(1)}% vs last period`
+      : '—';
+  updateTextContent(marketChangeEls, changeLabel);
+}
+
+function updateMarketOverlayComparison() {
+  if (!marketSummary || !marketMetricsBox || marketMetricsBox.classList.contains('is-hidden')) return;
+  const askingPrice = parseCurrencyValue(currencyInput?.value);
+  const counterOffer = parseCurrencyValue(totalPointsInput?.value);
+  const baseline = marketSummary.latestPrice || marketSummary.averagePrice;
+  if (Number.isFinite(askingPrice)) {
+    const { label, meta, status } = formatComparison(askingPrice, baseline);
+    updateTextContent(marketVsAskingEls, label);
+    updateTextContent(marketAskingMetaEls, meta);
+    applyComparisonVisual(marketAskingCards, marketAskingChips, status);
+  } else {
+    updateTextContent(marketVsAskingEls, '—');
+    updateTextContent(marketAskingMetaEls, 'Enter an asking price');
+    applyComparisonVisual(marketAskingCards, marketAskingChips, 'neutral', {
+      hasData: false,
+      emptyLabel: 'Awaiting asking price'
+    });
+  }
+
+  if (Number.isFinite(counterOffer)) {
+    const { label, meta, status } = formatComparison(counterOffer, baseline);
+    updateTextContent(marketVsCounterEls, label);
+    updateTextContent(marketCounterMetaEls, meta);
+    applyComparisonVisual(marketCounterCards, marketCounterChips, status);
+  } else {
+    updateTextContent(marketVsCounterEls, '—');
+    updateTextContent(marketCounterMetaEls, 'Select works to calculate a counter offer');
+    applyComparisonVisual(marketCounterCards, marketCounterChips, 'neutral', {
+      hasData: false,
+      emptyLabel: 'Awaiting counter offer'
+    });
+  }
+}
+
+function formatComparison(value, baseline) {
+  if (!Number.isFinite(value) || !Number.isFinite(baseline) || baseline === 0) {
+    return { label: '—', meta: 'No comparison available', status: 'neutral' };
+  }
+  const diff = value - baseline;
+  const percent = (diff / baseline) * 100;
+  const absValue = Math.abs(diff);
+  const sign = diff > 0 ? '+' : diff < 0 ? '-' : '';
+  const label = `${sign}${formatCurrencyForDisplay(absValue)}`;
+  let meta = 'Matches the regional average';
+  let status = 'equal';
+  if (diff > 0) {
+    status = 'above';
+    meta = `Above average by ${Math.abs(percent).toFixed(1)}%`;
+  } else if (diff < 0) {
+    status = 'below';
+    meta = `Below average by ${Math.abs(percent).toFixed(1)}%`;
+  }
+  return { label, meta, status };
+}
+
+function formatCurrencyForDisplay(value) {
+  if (!Number.isFinite(value)) return '—';
+  return Number(value).toLocaleString('en-GB', {
+    style: 'currency',
+    currency: 'GBP',
+    maximumFractionDigits: 0
+  });
+}
+
+function applyComparisonVisual(cardElements, chipElements, status = 'neutral', options = {}) {
+  const cards = Array.isArray(cardElements) ? cardElements : cardElements ? [cardElements] : [];
+  const chips = Array.isArray(chipElements) ? chipElements : chipElements ? [chipElements] : [];
+  if (!cards.length && !chips.length) return;
+  const { hasData = true, emptyLabel = 'Awaiting data' } = options;
+  const stateClass = status === 'above' ? 'is-up' : status === 'below' ? 'is-down' : 'is-neutral';
+  cards.forEach((card) => {
+    card.classList.remove('is-up', 'is-down', 'is-neutral');
+    card.classList.add(stateClass);
+  });
+
+  chips.forEach((chip) => chip.classList.remove('metric-chip--up', 'metric-chip--down', 'metric-chip--neutral'));
+
+  let chipClass = 'metric-chip--neutral';
+  let chipText = '—';
+  let ariaLabel = emptyLabel;
+
+  if (hasData) {
+    if (status === 'above') {
+      chipClass = 'metric-chip--up';
+      chipText = '▲ Above avg';
+      ariaLabel = 'Above the regional average';
+    } else if (status === 'below') {
+      chipClass = 'metric-chip--down';
+      chipText = '▼ Below avg';
+      ariaLabel = 'Below the regional average';
+    } else if (status === 'equal') {
+      chipClass = 'metric-chip--neutral';
+      chipText = '◎ Matches avg';
+      ariaLabel = 'Matches the regional average';
+    } else {
+      chipText = '—';
+      ariaLabel = 'Awaiting comparison';
+    }
+  }
+
+  chips.forEach((chip) => {
+    chip.classList.add(chipClass);
+    chip.textContent = chipText;
+    chip.setAttribute('aria-label', ariaLabel);
+  });
+}
+
 function setupPillEditing() {
   if (!conditionList) return;
 
@@ -562,4 +817,20 @@ function scaleWeights(source, factor) {
 if (regionSelect) {
   regionSelect.addEventListener('change', handleRegionSelection);
   handleRegionSelection();
+}
+
+if (offerPanel) {
+  const handleResize = () => {
+    refreshOfferScrollThreshold();
+    updateOfferScrollState();
+  };
+  refreshOfferScrollThreshold();
+  updateOfferScrollState();
+  window.addEventListener('scroll', updateOfferScrollState, { passive: true });
+  window.addEventListener('resize', handleResize);
+}
+
+if (conditionList) {
+  conditionList.addEventListener('scroll', updateChecklistScrollState, { passive: true });
+  updateChecklistScrollState();
 }
