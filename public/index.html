@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>House Counter-Offer</title>
+    <link rel="icon" type="image/x-icon" href="images/home.ico">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="app-header">
+      <div class="app-header__content">
+        <p class="eyebrow">House Checker</p>
+        <h1>House hunting can feel like juggling paint cans while riding a roller coaster—what even is a fair offer?</h1>
+        <p>We built this playful helper to keep the ride fun and shake the guesswork out.</p>
+     <br>
+      </div>
+    </header>
+    <main class="app-shell">
+      <!-- <section class="panel panel--finance">
+        <div class="panel__heading">
+          <p class="eyebrow">Mortgage snapshot</p>
+          <h2>Check affordability quickly</h2>
+          <p>Use the calculator for a rough guide before negotiating. <strong class="alert-inline">Illustration only, not financial advice.</strong></p>
+        </div>
+        <form class="mortgage-form" id="mortgage-form" novalidate>
+          <div class="form-grid">
+            <div class="field-block">
+              <label class="input-label" for="principal">Mortgage Amount</label>
+              <div class="input-with-prefix">
+                <span class="input-prefix" aria-hidden="true">£</span>
+                <input class="input-control" id="principal" name="principal" placeholder="e.g. 250000" type="text" inputmode="numeric" autocomplete="off">
+              </div>
+            </div>
+            <div class="field-block">
+              <label class="input-label" for="interestRate">Interest Rate (%)</label>
+              <input class="input-control" id="interestRate" name="interestRate" placeholder="4.85" type="text" inputmode="decimal" autocomplete="off">
+            </div>
+            <div class="field-block">
+              <label class="input-label" for="term">Mortgage Term (years)</label>
+              <input class="input-control" id="term" name="term" placeholder="25" type="text" inputmode="numeric" autocomplete="off">
+            </div>
+          </div>
+          <div class="field-block">
+            <label class="input-label" for="repaymentType">Repayment Type</label>
+            <select class="input-control" id="repaymentType" name="repaymentType">
+              <option value="repayment">Repayment</option>
+              <option value="interest-only">Interest only</option>
+            </select>
+          </div>
+          <button class="btn btn--primary" type="submit">Calculate</button>
+        </form>
+        <div class="alert alert--muted is-hidden" id="mortgage-status" role="status" aria-live="polite"></div>
+        <div class="mortgage-result" id="result" aria-live="polite"></div>
+      </section> -->
+
+      <section class="panel panel--offer">
+        <div class="panel__heading deductible-heading">
+          <p class="eyebrow">Counter-offer builder</p>
+          <h2>Keep pricing conversations fair</h2>
+        </div>
+        <div class="offer-grid">
+          <div class="field-block">
+            <label class="input-label" for="currency">Asking Price</label>
+            <div class="currency-input">
+              <span class="currency-prefix" aria-hidden="true">£</span>
+              <input id="currency" type="text" inputmode="numeric" autocomplete="off" oninput="formatCurrency(this)">
+            </div>
+            <p class="helper-text">Based on the listing or vendor guidance.</p>
+          </div>
+          <div class="field-block">
+            <label class="input-label" for="totalPoints">Counter Offer</label>
+            <div class="currency-input currency-input--readonly">
+              <span class="currency-prefix" aria-hidden="true">£</span>
+              <input id="totalPoints" type="text" disabled>
+            </div>
+            <p class="helper-text">Automatically updates as you select issues.</p>
+          </div>
+          <div class="field-block">
+            <label class="input-label" for="region">Select the Region of the Property</label>
+            <select class="input-control" id="region">
+              <option value="" selected disabled>Select the region of the property</option>
+              <option id="east-england" value="east-england">East of England</option>
+              <option id="east-midlands" value="east-midlands">East Midlands</option>
+              <option id="london" value="london">London</option>
+              <option id="north-east" value="north-east">North East</option>
+              <option id="north-west" value="north-west">North West</option>
+              <option id="south-east" value="south-east">South East</option>
+              <option id="south-west" value="south-west">South West</option>
+              <option id="west-midlands" value="west-midlands">West Midlands</option>
+              <option id="yorkshire-humber" value="yorkshire-humber">Yorkshire and The Humber</option>
+            </select>
+          </div>
+        </div>
+        <div class="alert alert--muted is-hidden" id="offer-status" role="status" aria-live="polite"></div>
+      </section>
+
+      <section class="panel panel--checklist" data-deductions="true">
+        <div class="panel__heading">
+          <p class="eyebrow">Property condition</p>
+          <h2>Tick the work that’s needed</h2>
+          <p>We have set predefined costs again each condition/element, but you can amend but clicking the price next to each.</p>
+        </div>
+        <div class="condition-scroller" id="deduction-list">
+          <div class="checkbox-group" data-section="Garden">
+            <div class="checkbox-group-header">Garden</div>
+            <div class="checkbox-row">
+              <label data-label="North, East or West facing"><input id="garden1" type="checkbox" onchange="updateTotal(this)"><span class="label-text">North, East or West facing</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="High maintenance garden">
+                <input id="garden2" type="checkbox" onchange="updateTotal(this)">
+                <span class="label-text">
+                  High maintenance garden
+                  <span class="tool-tip">
+                    <i class="tool-tip__icon" aria-hidden="true">i</i>
+                    <span class="tool-tip__info">
+                      <span class="info">We class this as a garden that has high trees, large bushes, exotic plants etc.</span>
+                    </span>
+                  </span>
+                </span>
+                <span class="deduction-pill" aria-live="polite"></span>
+              </label>
+              <label data-label="Requires one off professional landscaping"><input id="garden3" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Requires one off professional landscaping</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Size just not quite right"><input id="garden4" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Size just not quite right</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Fencing requires replacing/work"><input id="garden5" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Fencing requires replacing/work</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Rubble/Junk removal required"><input id="garden6" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Rubble/Junk removal required</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="No outside electric socket"><input id="garden7" type="checkbox" onchange="updateTotal(this)"><span class="label-text">No outside electric socket</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="No Water outlet"><input id="garden8" type="checkbox" onchange="updateTotal(this)"><span class="label-text">No Water outlet</span><span class="deduction-pill" aria-live="polite"></span></label>
+            </div>
+          </div>
+
+          <div class="checkbox-group rooms-group" data-section="Bedrooms">
+            <div class="checkbox-group-header" id="bedrooms-label">Bedrooms</div>
+            <div class="room-select">
+              <label for="room-count">Number of Bedrooms:</label>
+              <select id="room-count" onchange="updateRoomCount(this)">
+                <option value="0" selected>0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select>
+            </div>
+            <div class="rooms-grid" id="rooms-grid"></div>
+          </div>
+
+          <div class="checkbox-group" data-section="Kitchen">
+            <div class="checkbox-group-header">Kitchen</div>
+            <div class="checkbox-row">
+              <label data-label="Full Kitchen refurbishment"><input id="kitchen1" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Full Kitchen refurbishment</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Minor Kitchen refurbishment"><input id="kitchen2" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Minor Kitchen refurbishment</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Damaged Walls / Repair Required"><input id="kitchen3" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Damaged Walls / Repair Required</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Damp/Mold/Dew"><input id="kitchen4" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Damp/Mold/Dew</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Rubble/Junk removal required"><input id="kitchen5" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Rubble/Junk removal required</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Not enough counter space"><input id="kitchen6" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Not enough counter space</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Not enough storage"><input id="kitchen7" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Not enough storage</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="No Dishwasher"><input id="kitchen8" type="checkbox" onchange="updateTotal(this)"><span class="label-text">No Dishwasher</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Textured Ceiling"><input id="kitchen9" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Textured Ceiling</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Wallpaper removal"><input id="kitchen10" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Wallpaper removal</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Windows/Frames require replacing"><input id="kitchen11" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Windows/Frames require replacing</span><span class="deduction-pill" aria-live="polite"></span></label>
+            </div>
+          </div>
+
+          <div class="checkbox-group" data-section="Lounge">
+            <div class="checkbox-group-header">Lounge</div>
+            <div class="checkbox-row">
+              <label data-label="Full Lounge refurbishment"><input id="lounge1" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Full Lounge refurbishment</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Minor Lounge refurbishment"><input id="lounge2" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Minor Lounge refurbishment</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Damaged Walls / Repair Required"><input id="lounge3" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Damaged Walls / Repair Required</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Damp/Mold/Dew"><input id="lounge4" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Damp/Mold/Dew</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Repaint required"><input id="lounge5" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Repaint required</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Damage"><input id="lounge6" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Damage</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Textured Ceiling"><input id="lounge7" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Textured Ceiling</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Wallpaper removal"><input id="lounge8" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Wallpaper removal</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Windows/Frames require replacing"><input id="lounge9" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Windows/Frames require replacing</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Fireplace/Log burner requires cleaning"><input id="lounge10" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Fireplace/Log burner requires cleaning</span><span class="deduction-pill" aria-live="polite"></span></label>
+            </div>
+          </div>
+
+          <div class="checkbox-group" data-section="Toilet">
+            <div class="checkbox-group-header">Toilet</div>
+            <div class="checkbox-row">
+              <label data-label="Full Toilet refurbishment"><input id="toilet1" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Full Toilet refurbishment</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Minor Toilet refurbishment"><input id="toilet2" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Minor Toilet refurbishment</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Damaged Walls / Repair Required"><input id="toilet3" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Damaged Walls / Repair Required</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Damp/Mold/Dew"><input id="toilet4" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Damp/Mold/Dew</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Repaint required"><input id="toilet5" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Repaint required</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Damage"><input id="toilet6" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Damage</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Textured Ceiling"><input id="toilet7" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Textured Ceiling</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Wallpaper removal"><input id="toilet8" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Wallpaper removal</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="No Shower"><input id="toilet9" type="checkbox" onchange="updateTotal(this)"><span class="label-text">No Shower</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Poor/No Ventilation"><input id="toilet10" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Poor/No Ventilation</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Windows/Frames require replacing"><input id="toilet11" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Windows/Frames require replacing</span><span class="deduction-pill" aria-live="polite"></span></label>
+            </div>
+          </div>
+
+          <div class="checkbox-group" data-section="Loft">
+            <div class="checkbox-group-header">Loft</div>
+            <div class="checkbox-row">
+              <label data-label="No insulation"><input id="loft1" type="checkbox" onchange="updateTotal(this)"><span class="label-text">No insulation</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Not boarded for storage"><input id="loft2" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Not boarded for storage</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="No access ladder"><input id="loft3" type="checkbox" onchange="updateTotal(this)"><span class="label-text">No access ladder</span><span class="deduction-pill" aria-live="polite"></span></label>
+            </div>
+          </div>
+
+          <div class="checkbox-group" data-section="Stairs/Stairwell/Hallway">
+            <div class="checkbox-group-header">Stairs/Stairwell/Hallway</div>
+            <div class="checkbox-row">
+              <label data-label="Stairs require work"><input id="stairwell1" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Stairs require work</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Damaged Walls / Repair Required"><input id="stairwell2" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Damaged Walls / Repair Required</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Damp/Mold/Dew"><input id="stairwell3" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Damp/Mold/Dew</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Repaint required"><input id="stairwell4" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Repaint required</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Textured Ceiling"><input id="stairwell5" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Textured Ceiling</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Wallpaper removal"><input id="stairwell6" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Wallpaper removal</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Windows/Frames require replacing"><input id="stairwell7" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Windows/Frames require replacing</span><span class="deduction-pill" aria-live="polite"></span></label>
+            </div>
+          </div>
+
+          <div class="checkbox-group" data-section="House Exterior">
+            <div class="checkbox-group-header">House Exterior</div>
+            <div class="checkbox-row">
+              <label data-label="Facias require replacing"><input id="exterior1" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Facias require replacing</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Damaged Roof / Repair Required"><input id="exterior2" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Damaged Roof / Repair Required</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Damp/Mold/Dew"><input id="exterior3" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Damp/Mold/Dew</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Repaint required"><input id="exterior4" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Repaint required</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="No Driveway"><input id="exterior5" type="checkbox" onchange="updateTotal(this)"><span class="label-text">No Driveway</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Driveway too small for required cars"><input id="exterior6" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Driveway too small for required cars</span><span class="deduction-pill" aria-live="polite"></span></label>
+            </div>
+          </div>
+
+          <div class="checkbox-group" data-section="House General">
+            <div class="checkbox-group-header">House General</div>
+            <div class="checkbox-row">
+              <label data-label="Boiler outdated/no service history"><input id="general1" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Boiler outdated/no service history</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Electrics require replacing"><input id="general2" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Electrics require replacing</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="No Central Heating"><input id="general3" type="checkbox" onchange="updateTotal(this)"><span class="label-text">No Central Heating</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Rising Damp Symptoms"><input id="general4" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Rising Damp Symptoms</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Poor EPC Rating (C or above)"><input id="general5" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Poor EPC Rating (C or above)</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="No Drop Curve for drive"><input id="general6" type="checkbox" onchange="updateTotal(this)"><span class="label-text">No Drop Curve for drive</span><span class="deduction-pill" aria-live="polite"></span></label>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+    <script src="Main/script_main.js"></script>
+  </body>
+</html>
