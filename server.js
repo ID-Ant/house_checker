@@ -12,6 +12,7 @@ const PUBLIC_DIR = path.join(__dirname, 'public');
 const DATA_FILE = path.join(__dirname, 'ukhpi_data.json');
 const LAND_REGISTRY_HOST = 'landregistry.data.gov.uk';
 const UKHPI_PATH = '/app/ukhpi/browse';
+const UKHPI_CSV_PATH = '/app/ukhpi/download/new.csv';
 const EARLIEST_DATE = new Date(1995, 0, 1);
 const MAX_MONTH_RANGE = 36;
 
@@ -33,12 +34,12 @@ Object.keys(REGION_LOCATIONS).forEach((key) => {
 
 const DEFAULT_LOCATION = REGION_LOCATIONS['north-east'];
 const ALLOWED_LOCATION_URLS = new Set(Object.values(REGION_LOCATIONS));
-const PROPERTY_TYPE_FACTORS = {
-  detached: 1.15,
-  'semi-detached': 1.05,
-  terraced: 0.95,
-  flat: 0.85,
-  all: 1
+const PROPERTY_TYPE_FIELDS = {
+  all: 'All property types',
+  detached: 'Detached houses',
+  'semi-detached': 'Semi-detached houses',
+  terraced: 'Terraced houses',
+  flat: 'Flats and maisonettes'
 };
 
 const FETCH_HEADERS = {
@@ -130,20 +131,146 @@ function fetchHtml(url, redirects = 0) {
   });
 }
 
+async function fetchCsvText(url, redirects = 0) {
+  if (redirects > 5) {
+    throw new Error('Too many redirects while requesting UKHPI CSV');
+  }
+  return new Promise((resolve, reject) => {
+    const parsedUrl = new URL(url);
+    if (parsedUrl.hostname !== LAND_REGISTRY_HOST) {
+      reject(new Error('Blocked request to unexpected host'));
+      return;
+    }
+    const request = https.get(parsedUrl, { headers: FETCH_HEADERS }, (response) => {
+      const { statusCode = 0, headers } = response;
+      const locationHeader = headers?.location;
+      if ([301, 302, 307, 308].includes(statusCode) && locationHeader) {
+        response.resume();
+        const redirectedUrl = new URL(locationHeader, url);
+        if (redirectedUrl.hostname !== LAND_REGISTRY_HOST) {
+          reject(new Error('Unexpected redirect host when requesting UKHPI CSV'));
+          return;
+        }
+        fetchCsvText(redirectedUrl.toString(), redirects + 1).then(resolve).catch(reject);
+        return;
+      }
+      if (statusCode < 200 || statusCode >= 300) {
+        response.resume();
+        reject(new Error(`Failed to fetch UKHPI CSV (HTTP ${statusCode})`));
+        return;
+      }
+      const chunks = [];
+      response.on('data', (chunk) => chunks.push(chunk));
+      response.on('end', () => {
+        const buffer = Buffer.concat(chunks);
+        resolve(buffer.toString('utf8'));
+      });
+    });
+    request.on('error', reject);
+  });
+}
+
+function parseCsv(text = '') {
+  const rows = [];
+  let field = '';
+  let row = [];
+  let inQuotes = false;
+  let i = 0;
+  const input = text.replace(/^\uFEFF/, '');
+  while (i < input.length) {
+    const char = input[i];
+    if (char === '"') {
+      if (inQuotes && input[i + 1] === '"') {
+        field += '"';
+        i += 2;
+        continue;
+      }
+      inQuotes = !inQuotes;
+    } else if (char === ',' && !inQuotes) {
+      row.push(field);
+      field = '';
+    } else if ((char === '\n' || char === '\r') && !inQuotes) {
+      if (char === '\r' && input[i + 1] === '\n') {
+        i += 1;
+      }
+      row.push(field);
+      field = '';
+      if (row.some((value) => value !== '')) {
+        rows.push(row);
+      }
+      row = [];
+    } else {
+      field += char;
+    }
+    i += 1;
+  }
+  if (field.length || row.length) {
+    row.push(field);
+    if (row.some((value) => value !== '')) {
+      rows.push(row);
+    }
+  }
+  return rows;
+}
+
+async function fetchUkhpiCsv({ from, to, location }) {
+  const baseUrl = new URL(`https://${LAND_REGISTRY_HOST}${UKHPI_CSV_PATH}`);
+  const params = new URLSearchParams({ from, to, location });
+  params.append('thm[]', 'property_type');
+  params.append('in[]', 'avg');
+  baseUrl.search = params.toString();
+  console.log('[UKHPI CSV] Fetching', baseUrl.toString());
+  const csvText = await fetchCsvText(baseUrl.toString());
+  const rows = parseCsv(csvText);
+  if (!rows.length) {
+    throw new Error('Empty CSV data returned from UKHPI');
+  }
+  const headers = rows[0].map((value) => value.trim());
+  const records = rows
+    .slice(1)
+    .map((row) => {
+      const entry = {};
+      headers.forEach((header, index) => {
+        entry[header] = row[index] ?? '';
+      });
+      return entry;
+    })
+    .filter((entry) => Object.values(entry).some((value) => String(value || '').trim() !== ''));
+
+  return { headers, records, url: baseUrl.toString() };
+}
+
 async function fetchUkhpi({ from, to, location }) {
   const baseUrl = new URL(`https://${LAND_REGISTRY_HOST}${UKHPI_PATH}`);
   const params = new URLSearchParams({ from, to, location, lang: 'en' });
   const url = `${baseUrl.origin}${baseUrl.pathname}?${params.toString()}`;
+  console.log(`[UKHPI] Fetching market data`, { url });
   const html = await fetchHtml(url);
   const $ = cheerio.load(html);
   const table = $('table').first();
   if (!table.length) {
     throw new Error('No table found in UKHPI response');
   }
-
+  const headerRows = table.find('tr');
+  const firstRowCells = headerRows.eq(0).find('th,td');
+  const secondRowCells = headerRows.eq(1).find('th,td');
   const headers = [];
-  table.find('tr').first().find('th,td').each((_, cell) => {
-    headers.push($(cell).text().trim());
+  let secondIndex = 0;
+  firstRowCells.each((_, cell) => {
+    const $cell = $(cell);
+    const text = $cell.text().trim();
+    const colspan = parseInt($cell.attr('colspan') || '1', 10);
+    const rowspan = parseInt($cell.attr('rowspan') || '1', 10);
+    if (colspan > 1 && rowspan === 1 && secondRowCells.length) {
+      for (let i = 0; i < colspan; i += 1) {
+        const subCell = secondRowCells.eq(secondIndex);
+        const subText = subCell.text().trim();
+        headers.push(`${text} ${subText}`.trim());
+        secondIndex += 1;
+      }
+    } else {
+      headers.push(text);
+    }
   });
 
   const rows = [];
@@ -176,6 +303,7 @@ async function persistData(records) {
 function extractNumericField(record) {
   if (!record) return { key: null, value: null };
   const preferredKey =
+    Object.keys(record).find((key) => /all property types/i.test(key)) ||
     Object.keys(record).find((key) => /average/i.test(key) && /price/i.test(key)) ||
     Object.keys(record).find((key) => /average/i.test(key)) ||
     Object.keys(record).find((key) => /price/i.test(key));
@@ -184,44 +312,113 @@ function extractNumericField(record) {
   return { key, value };
 }
 
+function parseRecordDate(record) {
+  const rawLabel = record.Date || record.Period || record.Month;
+  if (!rawLabel) return null;
+  const cleaned = String(rawLabel).replace(/[^0-9a-zA-Z -]/g, ' ').replace(/\s+/g, ' ').trim();
+  if (!cleaned) return null;
+  const parsed = Date.parse(cleaned);
+  if (!Number.isNaN(parsed)) return new Date(parsed);
+  const monthYearMatch = cleaned.match(/([A-Za-z]+)\s+(\d{4})/);
+  if (monthYearMatch) {
+    const [_, month, year] = monthYearMatch;
+    const tentative = Date.parse(`${month} 1, ${year}`);
+    if (!Number.isNaN(tentative)) {
+      return new Date(tentative);
+    }
+  }
+  const isoMatch = cleaned.match(/(\d{4})[-/](\d{1,2})/);
+  if (isoMatch) {
+    const [, year, month] = isoMatch;
+    const tentative = new Date(Number(year), Number(month) - 1, 1);
+    if (!Number.isNaN(tentative.valueOf())) {
+      return tentative;
+    }
+  }
+  return null;
+}
+
+function normalizeHeaderLabel(label = '') {
+  return String(label).replace(/\s+/g, ' ').trim().toLowerCase();
+}
+
+function resolveFieldKey(keys = [], targetField) {
+  if (!targetField) return null;
+  const normalizedTarget = normalizeHeaderLabel(targetField);
+  return (
+    keys.find((key) => normalizeHeaderLabel(key) === normalizedTarget) ||
+    keys.find((key) => normalizeHeaderLabel(key).includes(normalizedTarget)) ||
+    null
+  );
+}
+
 function toCurrencyNumber(value) {
   if (value == null) return null;
   const numeric = Number(String(value).replace(/[^0-9.-]/g, ''));
   return Number.isFinite(numeric) ? numeric : null;
 }
 
-function summariseMarket(records, multiplier = 1) {
+function summariseMarket(records, targetField) {
   if (!Array.isArray(records) || !records.length) {
     return null;
   }
-  let fieldKey = null;
+  const candidateKeys = Object.keys(records[0] || {});
+  const resolvedField = resolveFieldKey(candidateKeys, targetField);
   const series = records
     .map((record, index) => {
-      const { key, value } = extractNumericField(record);
-      if (!fieldKey && key) fieldKey = key;
+      const label = record.Period || record.Month || record.Date || `Point ${index + 1}`;
+      let value = null;
+      let fieldKey = resolvedField;
+      if (fieldKey && record[fieldKey] != null) {
+        value = toCurrencyNumber(record[fieldKey]);
+      } else {
+        const fallback = extractNumericField(record);
+        fieldKey = fieldKey || fallback.key;
+        value = fallback.value;
+      }
       return {
-        label: record.Period || record.Month || record.Date || `Point ${index + 1}`,
-        value: Number.isFinite(value) ? value * multiplier : null
+        label,
+        date: parseRecordDate(record),
+        value: Number.isFinite(value) ? value : null,
+        fieldKey
       };
     })
     .filter((entry) => Number.isFinite(entry.value));
 
   if (!series.length) return null;
+  const ordered = series.sort((a, b) => {
+    if (a.date && b.date) return a.date - b.date;
+    if (a.date) return 1;
+    if (b.date) return -1;
+    return 0;
+  });
 
-  const values = series.map((entry) => entry.value);
-  const latest = series[0].value;
-  const earliest = series[series.length - 1].value;
-  const average = values.reduce((sum, value) => sum + value, 0) / values.length;
-  const changePercent = earliest ? ((latest - earliest) / earliest) * 100 : null;
+  const latestEntry = ordered[ordered.length - 1];
+  const previousEntry = ordered[ordered.length - 2];
+  const latestPrice = Math.round(latestEntry.value);
+  const previousValue = previousEntry?.value;
+  const changePercent =
+    Number.isFinite(previousValue) && previousValue !== 0
+      ? Number((((latestEntry.value - previousValue) / previousValue) * 100).toFixed(2))
+      : null;
+
+  console.log(`[UKHPI] Latest price resolved`, {
+    fieldKey: latestEntry.fieldKey,
+    latestLabel: latestEntry.label,
+    latestRawValue: latestEntry.value,
+    latestPrice,
+    previousLabel: previousEntry?.label,
+    previousValue
+  });
 
   return {
-    field: fieldKey,
-    latestPrice: Math.round(latest),
-    averagePrice: Math.round(average),
-    minPrice: Math.round(Math.min(...values)),
-    maxPrice: Math.round(Math.max(...values)),
-    changePercent: changePercent != null ? Number(changePercent.toFixed(2)) : null,
-    timeline: series.slice(0, 12)
+    field: latestEntry.fieldKey,
+    latestPrice,
+    averagePrice: latestPrice,
+    minPrice: latestPrice,
+    maxPrice: latestPrice,
+    changePercent,
+    timeline: ordered.slice(-12)
   };
 }
 
@@ -277,24 +474,26 @@ app.get('/api/market', async (req, res, next) => {
     const { from, to } = normalizeDateRange(sanitizedFrom, sanitizedTo);
     const resolvedLocation = normalizeLocation(req.query.location);
     const propertyType = String(req.query.type || 'all').toLowerCase();
-    const typeFactor = PROPERTY_TYPE_FACTORS[propertyType] || PROPERTY_TYPE_FACTORS.all;
+    const fieldLabel = PROPERTY_TYPE_FIELDS[propertyType] || PROPERTY_TYPE_FIELDS.all;
 
     if (!resolvedLocation.ok) {
       return res.status(400).json({ error: 'Unsupported location parameter' });
     }
 
-    const result = await fetchUkhpi({ from, to, location: resolvedLocation.value });
-    const summary = summariseMarket(result.records, typeFactor);
+    const csvResult = await fetchUkhpiCsv({ from, to, location: resolvedLocation.value });
+    const summary = summariseMarket(csvResult.records, fieldLabel);
 
     res.json({
       summary,
       metadata: {
-        source: result.url,
+        source: csvResult.url,
         fetchedAt: new Date().toISOString(),
         from,
         to,
         location: resolvedLocation.value,
-        propertyType
+        propertyType,
+        fieldLabel,
+        headers: csvResult.headers
       }
     });
   } catch (error) {
@@ -359,9 +558,10 @@ function normalizeLocationValue(value = '') {
 }
 
 function start() {
-  app.listen(PORT, () => {
+  const serverInstance = app.listen(PORT, () => {
     console.log(`House Checker server running on http://localhost:${PORT}`);
   });
+  return serverInstance;
 }
 
 if (require.main === module) {
