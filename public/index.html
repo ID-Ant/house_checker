@@ -139,6 +139,15 @@
           </div>
         </div>
         <div class="alert alert--muted is-hidden" id="offer-status" role="status" aria-live="polite"></div>
+        <div class="share-card">
+          <p class="eyebrow">Share or revisit later</p>
+          <p class="helper-text">Generate a link that reloads your region, price and selected work items.</p>
+          <div class="share-actions">
+            <button class="button button--primary" type="button" id="share-link-btn">Copy shareable link</button>
+            <input class="input-control input-control--readonly" type="text" id="share-link-output" readonly aria-live="polite" placeholder="Link will appear here">
+          </div>
+          <p class="helper-text" id="share-link-status" role="status" aria-live="polite"></p>
+        </div>
       </section>
 
       <section class="panel panel--checklist" data-deductions="true">
@@ -364,6 +373,7 @@
     <script src="js/app-core.js"></script>
     <script src="js/market.js"></script>
     <script src="js/deductions.js"></script>
+    <script src="js/share.js"></script>
     <script src="js/app.js"></script>
     <script src="Main/script_main.js"></script>
   </body>

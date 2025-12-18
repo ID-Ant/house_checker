@@ -117,11 +117,6 @@ function formatCurrency(input) {
     // Adjust the size of the input box based on the length of the input value
     input.size = Math.max(10, input.value.length + 2); // Minimum size is 10 characters
 }
-// Initialize the input box value to an empty string when the page loads
-document.addEventListener("DOMContentLoaded", function() {
-    var currencyInput = document.getElementById('currency');
-    currencyInput.value = ''; // Initialize the input box value to an empty string
-});
 // Function to handle region selection
 function handleRegionSelection() {
     var regionSelect = document.getElementById('region');
@@ -345,6 +340,9 @@ function updateRoomDisplay(roomCount) {
                 pointCheckbox.setAttribute('type', 'checkbox');
                 pointCheckbox.setAttribute('value', (index + 1).toString());
                 pointCheckbox.setAttribute('onchange', 'updateTotal(this)');
+                var checkboxId = 'room-' + (i + 1) + '-' + pointLabel.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+                pointCheckbox.id = checkboxId;
+                pointCheckbox.dataset.configId = checkboxId;
                 checkboxWrapper.appendChild(pointCheckbox);
                 checkboxWrapper.appendChild(document.createTextNode(' ' + pointLabel)); // Append the label text to the label element
                 roomCheckboxGroup.appendChild(checkboxWrapper); // Append the label to the checkbox group
@@ -354,3 +352,130 @@ function updateRoomDisplay(roomCount) {
         }
     }
 }
+
+function slugifyForConfig(text) {
+    return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+}
+
+function collectCheckboxStates() {
+    var checkboxes = document.querySelectorAll('.checkbox-group input[type="checkbox"]');
+    return Array.prototype.map.call(checkboxes, function(checkbox, index) {
+        if (!checkbox.id) {
+            var autoId = checkbox.dataset.configId || 'checkbox-' + index + '-' + slugifyForConfig(checkbox.parentElement.textContent || 'item');
+            checkbox.dataset.configId = autoId;
+            checkbox.id = autoId;
+        }
+        return {
+            id: checkbox.id || checkbox.dataset.configId,
+            checked: checkbox.checked
+        };
+    });
+}
+
+function applyCheckboxStates(savedCheckboxes) {
+    if (!Array.isArray(savedCheckboxes)) {
+        return;
+    }
+    savedCheckboxes.forEach(function(savedCheckbox) {
+        var checkbox = document.getElementById(savedCheckbox.id) || document.querySelector('[data-config-id="' + savedCheckbox.id + '"]');
+        if (checkbox) {
+            checkbox.checked = savedCheckbox.checked;
+        }
+    });
+}
+
+function buildConfigObject() {
+    return {
+        region: document.getElementById('region').value || '',
+        propertyType: document.getElementById('property-type').value || '',
+        askingPrice: document.getElementById('currency').value || '',
+        roomCount: document.getElementById('room-count').value || '0',
+        checkboxes: collectCheckboxStates()
+    };
+}
+
+function buildShareableUrl() {
+    var config = buildConfigObject();
+    var encodedConfig = btoa(JSON.stringify(config));
+    var url = new URL(window.location.href);
+    url.searchParams.set('config', encodedConfig);
+    return url.toString();
+}
+
+function applyConfigFromUrl() {
+    var params = new URLSearchParams(window.location.search);
+    var rawConfig = params.get('config');
+    if (!rawConfig) {
+        return;
+    }
+    try {
+        var decodedConfig = JSON.parse(atob(rawConfig));
+        if (decodedConfig.region) {
+            var regionSelect = document.getElementById('region');
+            regionSelect.value = decodedConfig.region;
+            handleRegionSelection();
+        }
+        if (decodedConfig.propertyType) {
+            document.getElementById('property-type').value = decodedConfig.propertyType;
+        }
+        if (decodedConfig.askingPrice) {
+            var currencyInput = document.getElementById('currency');
+            currencyInput.value = decodedConfig.askingPrice;
+            formatCurrency(currencyInput);
+        }
+        if (decodedConfig.roomCount) {
+            var roomCountSelect = document.getElementById('room-count');
+            roomCountSelect.value = decodedConfig.roomCount;
+            updateRoomDisplay(parseInt(decodedConfig.roomCount, 10));
+        }
+        applyCheckboxStates(decodedConfig.checkboxes);
+        updateTotal();
+    } catch (error) {
+        console.warn('Unable to apply config from URL:', error);
+    }
+}
+
+function setShareStatus(message) {
+    var statusEl = document.getElementById('share-link-status');
+    if (statusEl) {
+        statusEl.textContent = message;
+    }
+}
+
+function setupShareLink() {
+    var shareBtn = document.getElementById('share-link-btn');
+    var shareOutput = document.getElementById('share-link-output');
+    if (!shareBtn) {
+        return;
+    }
+    shareBtn.addEventListener('click', function() {
+        var shareableUrl = buildShareableUrl();
+        if (shareOutput) {
+            shareOutput.value = shareableUrl;
+        }
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(shareableUrl).then(function() {
+                setShareStatus('Link copied to clipboard.');
+            }).catch(function() {
+                setShareStatus('Copy failed. Use the textbox to copy manually.');
+                if (shareOutput) {
+                    shareOutput.focus();
+                    shareOutput.select();
+                }
+            });
+        } else {
+            setShareStatus('Link ready. Copy it from the textbox.');
+            if (shareOutput) {
+                shareOutput.focus();
+                shareOutput.select();
+            }
+        }
+    });
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    var currencyInput = document.getElementById('currency');
+    currencyInput.value = ''; // Initialize the input box value to an empty string
+    applyConfigFromUrl();
+    setupShareLink();
+});

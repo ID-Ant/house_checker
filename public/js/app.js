@@ -10,5 +10,9 @@
     if (app.deductions?.init) {
       app.deductions.init();
     }
+
+    if (app.share?.init) {
+      app.share.init();
+    }
   });
 })(window);
