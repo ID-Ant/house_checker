@@ -13,6 +13,7 @@ const DATA_FILE = path.join(__dirname, 'ukhpi_data.json');
 const LAND_REGISTRY_HOST = 'landregistry.data.gov.uk';
 const UKHPI_PATH = '/app/ukhpi/browse';
 const UKHPI_CSV_PATH = '/app/ukhpi/download/new.csv';
+const LAND_REGISTRY_ADDRESS_ENDPOINT = '/data/ppi/address.json';
 const EARLIEST_DATE = new Date(1995, 0, 1);
 const MAX_MONTH_RANGE = 36;
 
@@ -164,6 +165,64 @@ async function fetchCsvText(url, redirects = 0) {
       response.on('end', () => {
         const buffer = Buffer.concat(chunks);
         resolve(buffer.toString('utf8'));
+      });
+    });
+    request.on('error', reject);
+  });
+}
+
+function fetchLandRegistryJson(pathname, params = null, redirects = 0) {
+  if (redirects > 5) {
+    return Promise.reject(new Error('Too many redirects while requesting Land Registry data'));
+  }
+  return new Promise((resolve, reject) => {
+    const url = new URL(pathname, `https://${LAND_REGISTRY_HOST}`);
+    if (params instanceof URLSearchParams) {
+      params.forEach((value, key) => {
+        if (value !== undefined && value !== null && value !== '') {
+          url.searchParams.set(key, value);
+        }
+      });
+    } else if (params && typeof params === 'object') {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          url.searchParams.set(key, value);
+        }
+      });
+    }
+
+    console.log('[LandRegistry] Fetch', url.toString());
+    const request = https.get(url, { headers: FETCH_HEADERS }, (response) => {
+      const { statusCode = 0, headers } = response;
+      if ([301, 302, 307, 308].includes(statusCode) && headers?.location) {
+        response.resume();
+        const redirected = new URL(headers.location, url);
+        if (redirected.hostname !== LAND_REGISTRY_HOST) {
+          reject(new Error('Unexpected redirect host while requesting Land Registry data'));
+          return;
+        }
+        fetchLandRegistryJson(redirected.pathname + redirected.search, null, redirects + 1)
+          .then(resolve)
+          .catch(reject);
+        return;
+      }
+      if (statusCode < 200 || statusCode >= 300) {
+        response.resume();
+        reject(new Error(`Failed to fetch Land Registry data (HTTP ${statusCode})`));
+        return;
+      }
+      const chunks = [];
+      response.on('data', (chunk) => chunks.push(chunk));
+      response.on('end', () => {
+        try {
+          const json = JSON.parse(Buffer.concat(chunks).toString('utf8'));
+          const itemCount = Array.isArray(json?.result?.items) ? json.result.items.length : undefined;
+          const hasNext = Boolean(json?.result?.next);
+          console.log('[LandRegistry] Response parsed', { url: url.toString(), itemCount, hasNext });
+          resolve(json);
+        } catch (error) {
+          reject(new Error('Failed to parse Land Registry response'));
+        }
       });
     });
     request.on('error', reject);
@@ -422,6 +481,155 @@ function summariseMarket(records, targetField) {
   };
 }
 
+function normalizeAddressInput(value) {
+  if (typeof value !== 'string') return '';
+  return value.trim();
+}
+
+function uppercaseAddressInput(value) {
+  return normalizeAddressInput(value).toUpperCase();
+}
+
+function extractLabel(entity) {
+  if (!entity) return '';
+  if (typeof entity === 'string') return entity;
+  const source = entity.prefLabel || entity.label;
+  if (Array.isArray(source) && source.length) {
+    return source[0]?._value || source[0];
+  }
+  return '';
+}
+
+function formatTransactionDate(dateString) {
+  const parsed = new Date(dateString);
+  if (Number.isNaN(parsed.valueOf())) {
+    return { iso: null, display: dateString || '' };
+  }
+  const iso = parsed.toISOString().split('T')[0];
+  const display = new Intl.DateTimeFormat('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  }).format(parsed);
+  return { iso, display };
+}
+
+async function fetchPropertyAddresses(filters) {
+  const searchParams = new URLSearchParams();
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value) {
+      searchParams.set(key, value);
+    }
+  });
+  console.log('[LandRegistry] Address search', Object.fromEntries(searchParams));
+  const response = await fetchLandRegistryJson(LAND_REGISTRY_ADDRESS_ENDPOINT, searchParams);
+  const items = response?.result?.items;
+  console.log('[LandRegistry] Address matches', items?.length ?? 0);
+  if (!Array.isArray(items) || items.length === 0) {
+    return null;
+  }
+  return { records: items, source: response?.result?._about || '' };
+}
+
+async function fetchTransactionsForAddress(addressUrl) {
+  if (!addressUrl) {
+    return { items: [], source: '' };
+  }
+  const parsed = new URL(addressUrl);
+  if (parsed.hostname !== LAND_REGISTRY_HOST) {
+    throw new Error('Unexpected Land Registry address host');
+  }
+  const transactionPath = `${parsed.pathname.replace(/\/$/, '')}/transactions.json`;
+  const aggregatedItems = [];
+  const pageSize = 200;
+  let page = 0;
+  let pageItems = [];
+  let pagesFetched = 0;
+
+  do {
+    const params = new URLSearchParams({ _page: String(page), _pageSize: String(pageSize) });
+    console.log('[LandRegistry] Transactions page request', { addressUrl, page, pageSize });
+    const response = await fetchLandRegistryJson(transactionPath, params);
+    pageItems = Array.isArray(response?.result?.items) ? response.result.items : [];
+    aggregatedItems.push(...pageItems);
+    pagesFetched += 1;
+    page += 1;
+  } while (pageItems.length === pageSize);
+
+  console.log('[LandRegistry] Transactions fetched', {
+    addressUrl,
+    totalTransactions: aggregatedItems.length,
+    pagesFetched
+  });
+
+  return {
+    items: aggregatedItems,
+    source: `${parsed.origin}${transactionPath}`
+  };
+}
+
+function buildAddressSummary(record) {
+  if (!record) return null;
+  return {
+    line1: [record.paon, record.saon, record.street].filter(Boolean).join(' ').trim(),
+    town: record.town || record.locality || '',
+    locality: record.locality || '',
+    district: record.district || '',
+    county: record.county || '',
+    postcode: record.postcode || ''
+  };
+}
+
+function pickPreferredAddress(records = [], filters = {}) {
+  if (!records.length) return null;
+  const normalizedPaon = uppercaseAddressInput(filters.paon);
+  const normalizedStreet = uppercaseAddressInput(filters.street);
+  const normalizedPostcode = uppercaseAddressInput(filters.postcode);
+
+  const scored = records
+    .map((record) => {
+      let score = 0;
+      if (record.paon && uppercaseAddressInput(record.paon) === normalizedPaon) score += 4;
+      if (record.street && uppercaseAddressInput(record.street) === normalizedStreet) score += 3;
+      if (record.postcode && uppercaseAddressInput(record.postcode) === normalizedPostcode) score += 5;
+      if (record.locality) score += 1;
+      if (record.town) score += 1;
+      return { record, score };
+    })
+    .sort((a, b) => b.score - a.score);
+
+  return scored[0]?.record || records[0];
+}
+
+function simplifyTransactions(items = []) {
+  return items
+    .map((item) => {
+      const { iso, display } = formatTransactionDate(item.transactionDate);
+      const recordStatusLabel = extractLabel(item.recordStatus);
+      return {
+        id: item.transactionId,
+        pricePaid: Number(item.pricePaid) || null,
+        estateType: extractLabel(item.estateType),
+        propertyType: extractLabel(item.propertyType),
+        transactionCategory: extractLabel(item.transactionCategory),
+        statusLabel: recordStatusLabel,
+        statusCode: recordStatusLabel ? recordStatusLabel.charAt(0).toUpperCase() : '',
+        isoDate: iso,
+        displayDate: display,
+        rawDate: item.transactionDate || ''
+      };
+    })
+    .sort((a, b) => {
+      if (a.isoDate && b.isoDate) {
+        if (a.isoDate === b.isoDate) return 0;
+        return a.isoDate < b.isoDate ? 1 : -1;
+      }
+      if (a.isoDate) return -1;
+      if (b.isoDate) return 1;
+      return b.rawDate.localeCompare(a.rawDate);
+    });
+}
+
 app.get('/api/ukhpi', async (req, res, next) => {
   try {
     const { from: defaultFrom, to: defaultTo } = defaultRange();
@@ -449,6 +657,67 @@ app.get('/api/ukhpi', async (req, res, next) => {
       headers: result.headers,
       rows: result.rows,
       records: result.records
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.get('/api/property-transactions', async (req, res, next) => {
+  try {
+    const rawPaon = normalizeAddressInput(req.query.paon);
+    const rawStreet = normalizeAddressInput(req.query.street);
+    const rawPostcode = normalizeAddressInput(req.query.postcode);
+
+    if (!rawPaon || !rawStreet || !rawPostcode) {
+      return res.status(400).json({ error: 'Building, street and postcode are required.' });
+    }
+
+    const normalizedFilters = {
+      paon: uppercaseAddressInput(rawPaon),
+      street: uppercaseAddressInput(rawStreet),
+      postcode: uppercaseAddressInput(rawPostcode)
+    };
+
+    const addressResult = await fetchPropertyAddresses(normalizedFilters);
+    if (!addressResult || !addressResult.records?.length) {
+      return res.status(404).json({ error: 'No matching address found.' });
+    }
+
+    const uniqueAddresses = addressResult.records
+      .map((record) => record?._about)
+      .filter((url, index, array) => typeof url === 'string' && url && array.indexOf(url) === index);
+
+    const allTransactions = [];
+    const seenIds = new Set();
+    for (const addressUrl of uniqueAddresses) {
+      const transactionResult = await fetchTransactionsForAddress(addressUrl);
+      (transactionResult.items || []).forEach((item) => {
+        if (item?.transactionId && !seenIds.has(item.transactionId)) {
+          seenIds.add(item.transactionId);
+          allTransactions.push(item);
+        }
+      });
+    }
+
+    const summaryRecord = pickPreferredAddress(addressResult.records, normalizedFilters);
+    const summary = buildAddressSummary(summaryRecord);
+    const transactions = simplifyTransactions(allTransactions);
+
+    res.json({
+      address: summary,
+      transactions,
+      metadata: {
+        fetchedAt: new Date().toISOString(),
+        addressSource: addressResult.source,
+        query: {
+          paon: rawPaon,
+          street: rawStreet,
+          postcode: rawPostcode
+        },
+        matchedAddressCount: addressResult.records.length,
+        transactionCount: transactions.length
+      }
     });
   } catch (error) {
     next(error);
@@ -512,7 +781,13 @@ function normalizeLocation(rawLocation) {
   try {
     const parsed = new URL(rawLocation);
     const normalizedUrl = normalizeLocationValue(`${parsed.origin}${parsed.pathname}`);
-    if (parsed.hostname === LAND_REGISTRY_HOST && ALLOWED_LOCATION_URLS.has(normalizedUrl)) {
+    const isRegionPath =
+      normalizedUrl.startsWith('http://landregistry.data.gov.uk/id/region/') ||
+      normalizedUrl.startsWith('https://landregistry.data.gov.uk/id/region/');
+    if (
+      parsed.hostname === LAND_REGISTRY_HOST &&
+      (ALLOWED_LOCATION_URLS.has(normalizedUrl) || isRegionPath)
+    ) {
       return { ok: true, value: normalizedUrl };
     }
   } catch (error) {

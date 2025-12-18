@@ -12,7 +12,7 @@
       <div class="app-header__content">
         <p class="eyebrow">House Checker</p>
         <h1><span class="headline-highlight">What is a fair price?</span></h1>
-        <p class="disclaimer">Heads up: this is illustrative guidance only and not financial advice.</p>
+        <p class="disclaimer">Take the guess work out. See historic Sale prices and caluclate a counter-offer</p>
      <br>
       </div>
     </header>
@@ -24,10 +24,13 @@
           <p>See how your asking or counter offer stacks up against the latest HM Land Registry snapshot.</p>
         </div>
         <div class="market-overlay" id="market-overlay">
-          <div class="market-type-select">
+          <div class="market-split">
+            <div class="market-split__panel market-split__panel--left">
+              <div class="market-type-select">
             <div class="field-block">
-              <label class="input-label" for="region">Select the Region of the Property</label>
-              <select class="input-control" id="region">
+              <label class="input-label" for="local-authority">Local authority</label>
+              <input id="local-authority" class="input-control input-control--readonly" type="text" placeholder="Auto-detected after a Land Registry search" readonly>
+              <select class="input-control visually-hidden" id="region" hidden aria-hidden="true">
                 <option value="" selected disabled>Select the region of the property</option>
                 <option value="east-england">East of England</option>
                 <option value="east-midlands">East Midlands</option>
@@ -40,40 +43,73 @@
                 <option value="yorkshire-humber">Yorkshire and The Humber</option>
               </select>
             </div>
-            <div class="field-block">
-              <label class="input-label" for="property-type">Property type</label>
-              <select id="property-type" class="input-control">
-                <option value="all" selected>All properties</option>
-                <option value="detached">Detached</option>
-                <option value="semi-detached">Semi-detached</option>
-                <option value="terraced">Terraced</option>
-                <option value="flat">Flat/Maisonette</option>
-              </select>
-            </div>
-          </div>
-          <p class="helper-text market-helper">Regional weights use HM Land Registry averages.</p>
-          <div class="market-overlay__status" id="market-status">Select a region to fetch market data.</div>
+                <div class="field-block">
+                  <label class="input-label" for="property-type">Property type</label>
+                  <select id="property-type" class="input-control">
+                    <option value="all" selected>All properties</option>
+                    <option value="detached">Detached</option>
+                    <option value="semi-detached">Semi-detached</option>
+                    <option value="terraced">Terraced</option>
+                    <option value="flat">Flat/Maisonette</option>
+                  </select>
+                </div>
+              </div>
+              <p class="helper-text market-helper">Regional weights use HM Land Registry averages.</p>
+              <div class="market-overlay__status" id="market-status">Select a region to fetch market data.</div>
           <div class="market-metrics is-hidden" id="market-metrics">
+            <div class="metric-card metric-card--delta" id="last-sold-card">
+              <div class="metric-card__header">
+                <p class="metric-label">Last sold price</p>
+                <span class="metric-chip metric-chip--neutral" id="last-sold-chip" aria-live="polite">—</span>
+              </div>
+              <p class="metric-value" id="last-sold-value">—</p>
+              <p class="metric-meta" id="last-sold-meta">Run a property search to view the last transaction.</p>
+            </div>
             <div class="metric-card">
               <p class="metric-label">Latest average</p>
               <p class="metric-value" id="market-latest">—</p>
               <p class="metric-meta" id="market-change">—</p>
             </div>
-            <div class="metric-card metric-card--delta" id="market-asking-card">
-              <div class="metric-card__header">
-                <p class="metric-label">Vs asking</p>
-                <span class="metric-chip metric-chip--neutral" id="market-asking-chip" aria-live="polite">—</span>
+                <div class="metric-card metric-card--delta" id="market-asking-card">
+                  <div class="metric-card__header">
+                    <p class="metric-label">Vs asking</p>
+                    <span class="metric-chip metric-chip--neutral" id="market-asking-chip" aria-live="polite">—</span>
+                  </div>
+                  <p class="metric-value" id="market-vs-asking">—</p>
+                  <p class="metric-meta" id="market-asking-meta">—</p>
+                </div>
+                <div class="metric-card metric-card--delta" id="market-counter-card">
+                  <div class="metric-card__header">
+                    <p class="metric-label">Vs counter offer</p>
+                    <span class="metric-chip metric-chip--neutral" id="market-counter-chip" aria-live="polite">—</span>
+                  </div>
+                  <p class="metric-value" id="market-vs-counter">—</p>
+                  <p class="metric-meta" id="market-counter-meta">—</p>
+                </div>
               </div>
-              <p class="metric-value" id="market-vs-asking">—</p>
-              <p class="metric-meta" id="market-asking-meta">—</p>
             </div>
-            <div class="metric-card metric-card--delta" id="market-counter-card">
-              <div class="metric-card__header">
-                <p class="metric-label">Vs counter offer</p>
-                <span class="metric-chip metric-chip--neutral" id="market-counter-chip" aria-live="polite">—</span>
+            <div class="market-split__panel market-split__panel--right">
+              <div class="market-address-card">
+                <p class="eyebrow">Know the address?</p>
+                <h3>Use the exact location</h3>
+                <p class="helper-text">Jump straight to property-level data when you already have the full address.</p>
+                <div class="field-block">
+                  <label class="input-label" for="address-building">Building name or number</label>
+                  <input id="address-building" class="input-control" type="text" inputmode="text" autocomplete="off" placeholder="e.g. 10A or Rose House">
+                  <p class="helper-text helper-text--error is-hidden" id="address-building-error">Enter a building name or number.</p>
+                </div>
+                <div class="field-block">
+                  <label class="input-label" for="address-street">Street</label>
+                  <input id="address-street" class="input-control" type="text" inputmode="text" autocomplete="street-address" placeholder="Street name">
+                  <p class="helper-text helper-text--error is-hidden" id="address-street-error">Enter the street name.</p>
+                </div>
+                <div class="field-block">
+                  <label class="input-label" for="address-postcode">Postcode</label>
+                  <input id="address-postcode" class="input-control" type="text" inputmode="text" autocomplete="postal-code" placeholder="e.g. SW1A 1AA">
+                  <p class="helper-text helper-text--error is-hidden" id="address-postcode-error" role="alert">Enter a valid UK postcode (e.g. SW1A 1AA).</p>
+                </div>
+                <button class="button button--primary market-address-submit" type="button">Search Land Registry</button>
               </div>
-              <p class="metric-value" id="market-vs-counter">—</p>
-              <p class="metric-meta" id="market-counter-meta">—</p>
             </div>
           </div>
         </div>
@@ -253,6 +289,14 @@
       </section>
     </main>
 
+    <div class="property-float" id="property-float" aria-live="polite">
+      <div class="metric-card metric-card--compact">
+        <p class="metric-label">Last sold price</p>
+        <p class="metric-value" id="property-float-price">—</p>
+        <p class="metric-meta" id="property-float-meta">—</p>
+      </div>
+    </div>
+
     <div class="market-float" id="market-float" aria-live="polite">
       <div class="metric-card metric-card--compact">
         <p class="metric-label">Latest average</p>
@@ -274,6 +318,46 @@
         </div>
         <p class="metric-value" id="market-vs-counter-floating">—</p>
         <p class="metric-meta" id="market-counter-meta-floating">—</p>
+      </div>
+    </div>
+
+    <div class="modal" id="land-registry-modal" aria-hidden="true" aria-modal="true" role="dialog" aria-labelledby="land-registry-modal-title">
+      <div class="modal__overlay" id="land-registry-overlay" role="presentation" data-modal-dismiss></div>
+      <div class="modal__panel" role="document">
+        <button class="modal__close" type="button" id="land-registry-close" aria-label="Close dialog" data-modal-dismiss>
+          <span aria-hidden="true">×</span>
+        </button>
+        <p class="eyebrow">Land Registry lookup</p>
+        <p class="helper-text modal__helper">Below are all the Sale Prices of the property pulled from HM Land Registry.</p>
+        <div class="modal__status" id="land-registry-modal-status">Enter an address to view its history.</div>
+        <div class="modal__body">
+          <p class="modal__eyebrow">Transaction history</p>
+          <div class="lr-results is-hidden" id="land-registry-results">
+            <p class="lr-results__address" id="land-registry-address-line">—</p>
+            <p class="lr-results__meta" id="land-registry-address-meta"></p>
+            <div class="lr-history">
+              <div class="lr-history__scroll">
+                <table class="lr-history__table" aria-live="polite">
+                  <thead>
+                    <tr>
+                      <th scope="col">Type</th>
+                      <th scope="col">Date</th>
+                      <th scope="col">Price</th>
+                    </tr>
+                  </thead>
+                  <tbody id="land-registry-history-body">
+                    <tr>
+                      <td colspan="3">No transactions yet.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal__actions">
+          <button class="button button--primary" type="button" id="land-registry-modal-cta" data-modal-dismiss data-modal-initial>Continue</button>
+        </div>
       </div>
     </div>
 
