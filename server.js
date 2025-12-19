@@ -64,6 +64,19 @@ const apiLimiter = rateLimit({
 });
 
 app.use('/api/', apiLimiter);
+
+// Cache policy: short for HTML, long for static assets
+app.use((req, res, next) => {
+  const isHtml = req.path === '/' || req.path.endsWith('.html');
+  if (isHtml) {
+    res.setHeader('Cache-Control', 'public, max-age=300, must-revalidate');
+  } else if (/\.(css|js|svg|png|jpg|jpeg|webp|ico)$/i.test(req.path)) {
+    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+  }
+  res.setHeader('X-Robots-Tag', 'index, follow');
+  next();
+});
+
 app.use(express.static(PUBLIC_DIR));
 
 function formatDate(date) {
