@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://housenegotiator.co.uk/sitemap.xml
