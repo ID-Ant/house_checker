@@ -77,6 +77,17 @@ app.use((req, res, next) => {
   next();
 });
 
+// Explicit robots.txt handler to avoid platform overrides
+app.get('/robots.txt', (req, res) => {
+  res.type('text/plain');
+  res.send(`User-agent: *
+Allow: /
+
+Sitemap: https://housenegotiator.co.uk/sitemap.xml
+Sitemap: https://www.housenegotiator.co.uk/sitemap.xml
+`);
+});
+
 app.use(express.static(PUBLIC_DIR));
 
 function formatDate(date) {
