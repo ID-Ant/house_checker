@@ -853,7 +853,7 @@ function normalizeLocationValue(value = '') {
 
 function start() {
   const serverInstance = app.listen(PORT, () => {
-    console.log(`House Checker server running on http://localhost:${PORT}`);
+    console.log(`House Negotiator server running on http://localhost:${PORT}`);
   });
   return serverInstance;
 }
