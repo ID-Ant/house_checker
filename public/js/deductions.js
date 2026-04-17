@@ -268,20 +268,11 @@
       'Windows require replacing'
     ];
 
-    const createRow = () => {
-      const row = document.createElement('div');
-      row.className = 'rooms-row';
-      roomsGrid.appendChild(row);
-      return row;
-    };
-
-    let activeRow = createRow();
+    const row = document.createElement('div');
+    row.className = 'rooms-row';
+    roomsGrid.appendChild(row);
 
     for (let i = 0; i < roomCount; i += 1) {
-      if (roomCount > 3 && i === 3) {
-        activeRow = createRow();
-      }
-
       const roomFrame = document.createElement('div');
       roomFrame.className = 'room-frame';
 
@@ -316,7 +307,7 @@
       });
 
       roomFrame.appendChild(roomCheckboxGroup);
-      activeRow.appendChild(roomFrame);
+      row.appendChild(roomFrame);
     }
 
     refreshDeductionPills();
