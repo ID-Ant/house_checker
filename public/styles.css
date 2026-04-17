@@ -230,6 +230,13 @@ img {
   background: rgba(255, 255, 255, 0.24);
 }
 
+.content-nav a.is-active,
+.content-nav a[aria-current="page"] {
+  background: rgba(255, 255, 255, 0.28);
+  border-color: rgba(255, 255, 255, 0.42);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.22);
+}
+
 .content-grid {
   display: grid;
   gap: 1rem;
