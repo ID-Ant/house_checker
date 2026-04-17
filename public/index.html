@@ -24,18 +24,36 @@
         "@graph": [
           {
             "@type": "Organization",
-            "name": "House Negotiator",
+            "@id": "https://housenegotiator.co.uk/#organization",
+            "name": "House Checker",
+            "alternateName": "House Negotiator",
             "url": "https://housenegotiator.co.uk/",
-            "logo": "https://housenegotiator.co.uk/images/social-share.svg"
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://housenegotiator.co.uk/images/social-share.svg"
+            }
           },
           {
             "@type": "WebSite",
-            "name": "House Negotiator",
+            "@id": "https://housenegotiator.co.uk/#website",
+            "name": "House Checker",
             "url": "https://housenegotiator.co.uk/",
-            "potentialAction": {
-              "@type": "SearchAction",
-              "target": "https://housenegotiator.co.uk/?q={search_term_string}",
-              "query-input": "required name=search_term_string"
+            "publisher": {
+              "@id": "https://housenegotiator.co.uk/#organization"
+            }
+          },
+          {
+            "@type": "WebApplication",
+            "@id": "https://housenegotiator.co.uk/#webapp",
+            "name": "House Checker",
+            "url": "https://housenegotiator.co.uk/",
+            "applicationCategory": "FinanceApplication",
+            "operatingSystem": "Web",
+            "description": "A UK house offer calculator that compares asking prices with HM Land Registry market context and estimated repair costs.",
+            "image": "https://housenegotiator.co.uk/images/social-share.svg",
+            "isAccessibleForFree": true,
+            "publisher": {
+              "@id": "https://housenegotiator.co.uk/#organization"
             }
           }
         ]
