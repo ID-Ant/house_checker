@@ -3,20 +3,20 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>House Negotiator | Fair Counter-Offer Calculator</title>
+    <title>House Offer Calculator UK | Fair Counter-Offer Tool</title>
     <link rel="canonical" href="https://housenegotiator.co.uk/">
-    <meta name="description" content="Calculate a fair counter-offer using HM Land Registry data, local authority signals, and property condition costs with House Negotiator.">
+    <meta name="description" content="Estimate a fair house offer in the UK using HM Land Registry data, local market averages, and repair costs to build a realistic counter-offer.">
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
-    <meta property="og:title" content="House Negotiator | Fair Counter-Offer Calculator">
-    <meta property="og:description" content="Calculate a fair counter-offer using HM Land Registry data, local authority signals, and property condition costs.">
+    <meta property="og:title" content="House Offer Calculator UK | Fair Counter-Offer Tool">
+    <meta property="og:description" content="Estimate a fair house offer using HM Land Registry data, local averages, and repair costs to build a realistic UK property counter-offer.">
     <meta property="og:url" content="https://housenegotiator.co.uk/">
     <meta property="og:type" content="website">
     <meta property="og:image" content="https://housenegotiator.co.uk/images/social-share.svg">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="House Negotiator | Fair Counter-Offer Calculator">
-    <meta name="twitter:description" content="Calculate a fair counter-offer using HM Land Registry data, local authority signals, and property condition costs.">
+    <meta name="twitter:title" content="House Offer Calculator UK | Fair Counter-Offer Tool">
+    <meta name="twitter:description" content="Estimate a fair house offer using HM Land Registry data, local averages, and repair costs to build a realistic UK property counter-offer.">
     <meta name="twitter:image" content="https://housenegotiator.co.uk/images/social-share.svg">
     <script type="application/ld+json">
       {
@@ -48,17 +48,17 @@
     <header class="app-header">
       <div class="app-header__content">
         <p class="eyebrow">House Checker</p>
-        <h1><span class="headline-highlight">What is a fair price?</span></h1>
-        <p class="disclaimer">Take the guess work out. See historic Sale prices and caluclate a counter-offer</p>
-     <br>
+        <h1><span class="headline-highlight">House Offer Calculator for UK Buyers</span></h1>
+        <p class="disclaimer">Estimate a fair house offer using sold-price data, local market context, and repair costs before you make a counter-offer.</p>
+        <p class="disclaimer">Use the calculator to compare the asking price with HM Land Registry averages, then factor in the cost of work needed at the property.</p>
       </div>
     </header>
     <main class="app-shell">
       <section class="panel panel--market" id="market-panel">
         <div class="panel__heading">
           <p class="eyebrow">Market pulse</p>
-          <h2>Compare with Land Registry averages</h2>
-          <p>See how your asking or counter offer stacks up against the latest HM Land Registry snapshot.</p>
+          <h2>Compare the asking price with HM Land Registry averages</h2>
+          <p>Check how the asking price or your target offer compares with recent UK property price data for the local area and property type.</p>
         </div>
         <div class="market-overlay" id="market-overlay">
           <div class="market-split">
@@ -155,7 +155,7 @@
       <section class="panel panel--offer">
         <div class="panel__heading deductible-heading">
           <p class="eyebrow">Counter-offer builder</p>
-          <h2>Keep pricing conversations fair</h2>
+          <h2>Build a data-backed property counter-offer</h2>
         </div>
         <div class="offer-grid">
           <div class="field-block">
@@ -164,7 +164,7 @@
               <span class="currency-prefix" aria-hidden="true">£</span>
               <input id="currency" type="text" inputmode="numeric" autocomplete="off" oninput="formatCurrency(this)">
             </div>
-            <p class="helper-text">Based on the listing or vendor guidance.</p>
+            <p class="helper-text">Enter the advertised price or the seller's guide price.</p>
           </div>
           <div class="field-block">
             <label class="input-label" for="totalPoints">Counter Offer</label>
@@ -172,13 +172,13 @@
               <span class="currency-prefix" aria-hidden="true">£</span>
               <input id="totalPoints" type="text" disabled>
             </div>
-            <p class="helper-text">Automatically updates as you select issues.</p>
+            <p class="helper-text">Updates automatically as you add repairs, defects, and improvements.</p>
           </div>
         </div>
         <div class="alert alert--muted is-hidden" id="offer-status" role="status" aria-live="polite"></div>
         <div class="share-card">
           <p class="eyebrow">Share or revisit later</p>
-          <p class="helper-text">Generate a link that reloads your region, price and selected work items.</p>
+          <p class="helper-text">Generate a link that reloads your location, asking price, and selected repair items.</p>
           <div class="share-actions">
             <button class="button button--primary" type="button" id="share-link-btn">Copy shareable link</button>
             <input class="input-control input-control--readonly" type="text" id="share-link-output" readonly aria-live="polite" placeholder="Link will appear here">
@@ -190,8 +190,8 @@
       <section class="panel panel--checklist" data-deductions="true">
         <div class="panel__heading">
           <p class="eyebrow">Property condition</p>
-          <h2>Tick the work that’s needed</h2>
-          <p>We have set predefined costs again each condition/element, but you can amend but clicking the price next to each.</p>
+          <h2>Add repair and improvement costs</h2>
+          <p>Start with the preset property repair costs, then adjust any item to better reflect the condition of the home you are assessing.</p>
         </div>
         <div class="condition-scroller" id="deduction-list">
           <div class="checkbox-group" data-section="Garden">
