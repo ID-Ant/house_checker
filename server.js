@@ -67,25 +67,20 @@ app.use('/api/', apiLimiter);
 
 // Cache policy: short for HTML, long for static assets
 app.use((req, res, next) => {
+  const isApiRequest = /^\/api(?:\/|$)/.test(req.path);
   const isHtml = req.path === '/' || req.path.endsWith('.html');
   if (isHtml) {
     res.setHeader('Cache-Control', 'public, max-age=300, must-revalidate');
   } else if (/\.(css|js|svg|png|jpg|jpeg|webp|ico)$/i.test(req.path)) {
     res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
   }
-  res.setHeader('X-Robots-Tag', 'index, follow');
+  res.setHeader('X-Robots-Tag', isApiRequest ? 'noindex, nofollow' : 'index, follow');
   next();
 });
 
 // Explicit robots.txt handler to avoid platform overrides
 app.get('/robots.txt', (req, res) => {
-  res.type('text/plain');
-  res.send(`User-agent: *
-Allow: /
-
-Sitemap: https://housenegotiator.co.uk/sitemap.xml
-Sitemap: https://www.housenegotiator.co.uk/sitemap.xml
-`);
+  res.sendFile(path.join(PUBLIC_DIR, 'robots.txt'));
 });
 
 app.use(express.static(PUBLIC_DIR));

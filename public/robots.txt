@@ -2,6 +2,3 @@ User-agent: *
 Allow: /
 
 Sitemap: https://housenegotiator.co.uk/sitemap.xml
-Sitemap: https://housenegotiator.co.uk/sitemap.xml
-Sitemap: https://www.housenegotiator.co.uk/sitemap.xml
-Sitemap: https://www.housenegotiator.co.uk/sitemap.xml
