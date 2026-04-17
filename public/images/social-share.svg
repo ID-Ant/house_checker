@@ -1,16 +1,26 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
-  <title id="title">House Negotiator social preview</title>
-  <desc id="desc">A branded placeholder social preview for House Negotiator</desc>
+  <title id="title">House Checker social preview</title>
+  <desc id="desc">A social preview card for the House Checker UK house offer calculator</desc>
   <defs>
     <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#0f172a"/>
-      <stop offset="50%" stop-color="#0b5ed7"/>
-      <stop offset="100%" stop-color="#0f172a"/>
+      <stop offset="48%" stop-color="#2357d9"/>
+      <stop offset="100%" stop-color="#0b1737"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.20)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0.08)"/>
     </linearGradient>
   </defs>
   <rect width="1200" height="630" fill="url(#bg)"/>
-  <rect x="80" y="120" width="1040" height="390" rx="28" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
-  <text x="120" y="260" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="64" font-weight="700">House Negotiator</text>
-  <text x="120" y="330" fill="#cbd5e1" font-family="Helvetica, Arial, sans-serif" font-size="36" font-weight="400">Fair counter-offers, grounded in Land Registry data.</text>
-  <text x="120" y="390" fill="#cbd5e1" font-family="Helvetica, Arial, sans-serif" font-size="28" font-weight="400">housenegotiator.co.uk</text>
+  <circle cx="1110" cy="106" r="140" fill="rgba(255,255,255,0.08)"/>
+  <circle cx="170" cy="560" r="160" fill="rgba(255,255,255,0.05)"/>
+  <rect x="70" y="82" width="1060" height="466" rx="34" fill="url(#panel)" stroke="rgba(255,255,255,0.16)" stroke-width="2"/>
+  <text x="105" y="146" fill="#dbe7ff" font-family="Helvetica, Arial, sans-serif" font-size="30" font-weight="700" letter-spacing="5">HOUSE CHECKER</text>
+  <text x="105" y="260" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="78" font-weight="700">House Offer Calculator</text>
+  <text x="105" y="340" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="78" font-weight="700">for UK Buyers</text>
+  <text x="105" y="418" fill="#d7e4ff" font-family="Helvetica, Arial, sans-serif" font-size="33" font-weight="400">Compare asking prices, HM Land Registry context,</text>
+  <text x="105" y="466" fill="#d7e4ff" font-family="Helvetica, Arial, sans-serif" font-size="33" font-weight="400">and repair costs before you make a counter-offer.</text>
+  <rect x="105" y="496" width="338" height="42" rx="21" fill="rgba(255,255,255,0.14)" stroke="rgba(255,255,255,0.22)" stroke-width="1.5"/>
+  <text x="131" y="524" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="24" font-weight="700">housenegotiator.co.uk</text>
 </svg>
