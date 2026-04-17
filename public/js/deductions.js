@@ -261,7 +261,7 @@
       'Size too small',
       'Requires painting',
       'Walls need work',
-      'Damage/Mold/Dew/leakage',
+      'Damage/Mould/Dew/leakage',
       'Wallpaper removal',
       'Skirting/fixture replacing',
       'Textured Ceiling',
