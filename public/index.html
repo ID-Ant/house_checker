@@ -3,12 +3,12 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>House Offer Calculator UK | Fair Counter-Offer Tool</title>
+    <title>House Offer Calculator UK | Estimate a Fair Property Offer</title>
     <link rel="canonical" href="https://housenegotiator.co.uk/">
-    <meta name="description" content="Estimate a fair house offer in the UK using HM Land Registry data, local market averages, and repair costs to build a realistic counter-offer.">
+    <meta name="description" content="Use House Negotiator to estimate a fair house offer in the UK using HM Land Registry market context, asking price comparison, and repair costs before you make a counter-offer.">
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
-    <meta property="og:title" content="House Offer Calculator UK | Fair Counter-Offer Tool">
-    <meta property="og:description" content="Estimate a fair house offer using HM Land Registry data, local averages, and repair costs to build a realistic UK property counter-offer.">
+    <meta property="og:title" content="House Offer Calculator UK | Estimate a Fair Property Offer">
+    <meta property="og:description" content="Use House Negotiator to compare the asking price with HM Land Registry market context and repair costs before making a UK property offer.">
     <meta property="og:url" content="https://housenegotiator.co.uk/">
     <meta property="og:type" content="website">
     <meta property="og:image" content="https://housenegotiator.co.uk/images/social-share.png">
@@ -17,8 +17,8 @@
     <meta property="og:image:height" content="630">
     <meta property="og:image:alt" content="House Negotiator social preview for the UK house offer calculator">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="House Offer Calculator UK | Fair Counter-Offer Tool">
-    <meta name="twitter:description" content="Estimate a fair house offer using HM Land Registry data, local averages, and repair costs to build a realistic UK property counter-offer.">
+    <meta name="twitter:title" content="House Offer Calculator UK | Estimate a Fair Property Offer">
+    <meta name="twitter:description" content="Use House Negotiator to compare the asking price with HM Land Registry market context and repair costs before making a UK property offer.">
     <meta name="twitter:image" content="https://housenegotiator.co.uk/images/social-share.png">
     <meta name="twitter:image:alt" content="House Negotiator social preview for the UK house offer calculator">
     <script type="application/ld+json">
@@ -73,6 +73,8 @@
         <p class="disclaimer">Use the calculator to compare the asking price with HM Land Registry averages, then factor in the cost of work needed at the property.</p>
         <nav class="content-nav home-nav" aria-label="Site links">
           <a href="/about/">About</a>
+          <a href="/what-should-i-offer-on-a-house/">What Should I Offer?</a>
+          <a href="/how-to-negotiate-house-price-uk/">How to Negotiate</a>
           <a href="/how-it-works/">How It Works</a>
           <a href="/faq/">FAQ</a>
           <a href="/privacy/">Privacy</a>
@@ -184,22 +186,26 @@
           <p class="eyebrow">Counter-offer builder</p>
           <h2>Build a data-backed property counter-offer</h2>
         </div>
-        <div class="offer-grid">
-          <div class="field-block">
-            <label class="input-label" for="currency">Asking Price</label>
-            <div class="currency-input">
-              <span class="currency-prefix" aria-hidden="true">£</span>
-              <input id="currency" type="text" inputmode="numeric" autocomplete="off" oninput="formatCurrency(this)">
+        <div class="offer-sticky-shell">
+          <div class="offer-sticky-fields">
+            <div class="offer-grid">
+              <div class="field-block">
+                <label class="input-label" for="currency">Asking Price</label>
+                <div class="currency-input">
+                  <span class="currency-prefix" aria-hidden="true">£</span>
+                  <input id="currency" type="text" inputmode="numeric" autocomplete="off" oninput="formatCurrency(this)">
+                </div>
+                <p class="helper-text">Enter the advertised price or the seller's guide price.</p>
+              </div>
+              <div class="field-block">
+                <label class="input-label" for="totalPoints">Counter Offer</label>
+                <div class="currency-input currency-input--readonly">
+                  <span class="currency-prefix" aria-hidden="true">£</span>
+                  <input id="totalPoints" type="text" disabled>
+                </div>
+                <p class="helper-text">Updates automatically as you add repairs, defects, and improvements.</p>
+              </div>
             </div>
-            <p class="helper-text">Enter the advertised price or the seller's guide price.</p>
-          </div>
-          <div class="field-block">
-            <label class="input-label" for="totalPoints">Counter Offer</label>
-            <div class="currency-input currency-input--readonly">
-              <span class="currency-prefix" aria-hidden="true">£</span>
-              <input id="totalPoints" type="text" disabled>
-            </div>
-            <p class="helper-text">Updates automatically as you add repairs, defects, and improvements.</p>
           </div>
         </div>
         <div class="alert alert--muted is-hidden" id="offer-status" role="status" aria-live="polite"></div>
@@ -211,6 +217,32 @@
             <input class="input-control input-control--readonly" type="text" id="share-link-output" readonly aria-live="polite" placeholder="Link will appear here">
           </div>
           <p class="helper-text" id="share-link-status" role="status" aria-live="polite"></p>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel__heading">
+          <p class="eyebrow">Offer research</p>
+          <h2>Use the calculator alongside practical house-offer guidance</h2>
+          <p>House Negotiator is designed to help UK buyers estimate a fair property offer before speaking to the estate agent. The strongest offer strategy usually comes from combining the calculator with sold-price context, realistic repair costs, and a clear negotiation plan.</p>
+          <p>If you are still deciding what to offer on a house in the UK, start by reviewing the asking price against local evidence, then use the calculator to sense-check how visible work should affect your number.</p>
+        </div>
+        <div class="content-columns">
+          <article class="content-card">
+            <h3>What should I offer on a house?</h3>
+            <p>Use sold-price evidence, time-on-market clues, and repair costs to work out a realistic opening offer instead of relying on a flat percentage below asking.</p>
+            <p><a href="/what-should-i-offer-on-a-house/">Read the UK house-offer guide</a></p>
+          </article>
+          <article class="content-card">
+            <h3>How should I negotiate house price?</h3>
+            <p>Learn how to justify a lower number, when to make a counter-offer, and how to present your position clearly to the estate agent.</p>
+            <p><a href="/how-to-negotiate-house-price-uk/">Read the house-price negotiation guide</a></p>
+          </article>
+        </div>
+        <div class="content-card content-callout">
+          <h3>Why this approach gives buyers a stronger position</h3>
+          <p>A house offer calculator is most useful when it supports a real buying decision. Comparing the asking price with HM Land Registry context can help you see whether the property looks fairly priced, while repair costs can show whether the guide price still makes sense once the condition of the home is taken into account.</p>
+          <p>That combination gives you a more defensible starting point if you need to make an opening bid, explain a lower offer, or prepare a counter-offer on a house that needs work.</p>
         </div>
       </section>
 
@@ -406,6 +438,8 @@
           <p class="eyebrow">Explore</p>
           <div class="site-footer__links">
             <a href="/about/">About</a>
+            <a href="/what-should-i-offer-on-a-house/">What Should I Offer?</a>
+            <a href="/how-to-negotiate-house-price-uk/">How to Negotiate</a>
             <a href="/how-it-works/">How It Works</a>
             <a href="/faq/">FAQ</a>
           </div>

@@ -175,9 +175,6 @@ img {
 }
 
 .panel--offer {
-  position: sticky;
-  top: 0rem;
-  z-index: 30;
   padding: 2rem;
 }
 
@@ -308,6 +305,16 @@ img {
   background: #0f172a;
   color: rgba(255, 255, 255, 0.86);
   padding: 2.25rem 1rem 2.75rem;
+  opacity: 0;
+  transform: translateY(32px);
+  pointer-events: none;
+  transition: opacity 0.28s ease, transform 0.28s ease;
+}
+
+.site-footer.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
 }
 
 .site-footer__inner {
@@ -693,7 +700,28 @@ input[type="text"]:focus {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 1.5rem;
+}
+
+.offer-sticky-shell {
   margin-top: 1.25rem;
+}
+
+.offer-sticky-fields {
+  padding: 1rem 0 0.85rem;
+  background: var(--panel-bg);
+  border-bottom: 1px solid rgba(208, 213, 221, 0.8);
+  border: 1px solid var(--panel-border);
+  border-radius: 16px;
+}
+
+.offer-sticky-fields.is-floating {
+  position: fixed;
+  top: 0;
+  left: var(--offer-sticky-left, 0);
+  width: var(--offer-sticky-width, auto);
+  z-index: 50;
+  margin-top: 0;
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
 }
 
 .currency-input {
@@ -1156,7 +1184,7 @@ input[type="text"]:focus {
 }
 
 @media (max-width: 1024px) {
-  .panel--offer {
+  .offer-sticky-fields.is-floating {
     top: -0.25rem;
   }
 
@@ -1180,9 +1208,19 @@ input[type="text"]:focus {
     padding: 1.15rem;
   }
 
-  .panel--offer {
+  .offer-sticky-shell {
+    margin-top: 1rem;
+  }
+
+  .offer-sticky-fields,
+  .offer-sticky-fields.is-floating {
     position: static;
     top: auto;
+    left: auto;
+    width: auto;
+    padding: 0;
+    border-bottom: 0;
+    box-shadow: none;
   }
 
   .offer-grid {

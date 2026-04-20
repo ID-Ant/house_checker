@@ -7,6 +7,7 @@
 
   const UK_POSTCODE_REGEX =
     /^((GIR)\s?0AA|((([A-PR-UWYZ][0-9][0-9]?)|(([A-PR-UWYZ][A-HK-Y][0-9][0-9]?)|(([A-PR-UWYZ][0-9][A-HJKPS-UW])|([A-PR-UWYZ][A-HK-Y][0-9][ABEHMNPRVWXY]))))\s?[0-9][ABD-HJLNP-UW-Z]{2}))$/i;
+  const FOOTER_REVEAL_DISTANCE = 120;
 
   const REGION_KEYWORDS_MAP = {
     'county durham': 'north-east',
@@ -192,6 +193,9 @@
     propertyTypeSelect: null,
     conditionList: null,
     offerPanel: null,
+    offerStickyShell: null,
+    offerStickyFields: null,
+    siteFooter: null,
     marketStatusBox: null,
     marketMetricsBox: null,
     metricLatestEls: [],
@@ -240,6 +244,9 @@
     dom.propertyTypeSelect = document.getElementById('property-type');
     dom.conditionList = document.getElementById('deduction-list');
     dom.offerPanel = document.querySelector('.panel--offer');
+    dom.offerStickyShell = document.querySelector('.offer-sticky-shell');
+    dom.offerStickyFields = document.querySelector('.offer-sticky-fields');
+    dom.siteFooter = document.querySelector('.site-footer');
     dom.marketStatusBox = document.getElementById('market-status');
     dom.marketMetricsBox = document.getElementById('market-metrics');
     dom.metricLatestEls = collectTargets('market-latest', 'market-latest-floating');
@@ -459,9 +466,11 @@
     const handleResize = () => {
       refreshOfferScrollThreshold();
       updateOfferScrollState();
+      updateFooterVisibility();
     };
     refreshOfferScrollThreshold();
     updateOfferScrollState();
+    updateFooterVisibility();
     window.addEventListener('scroll', updateOfferScrollState, { passive: true });
     window.addEventListener('resize', handleResize);
 
@@ -596,9 +605,12 @@
   function refreshOfferScrollThreshold() {
     if (!dom.offerPanel) {
       state.offerScrollThreshold = Number.POSITIVE_INFINITY;
+      state.offerStickyThreshold = Number.POSITIVE_INFINITY;
       return;
     }
+    state.offerStickyThreshold = computeElementPageOffset(dom.offerStickyShell || dom.offerPanel);
     state.offerScrollThreshold = computeElementPageOffset(dom.offerPanel) + dom.offerPanel.offsetHeight;
+    refreshOfferStickyLayout();
   }
 
   function computeElementPageOffset(element) {
@@ -614,7 +626,42 @@
   function updateOfferScrollState() {
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop || 0;
     state.hasScrolledPastOffer = scrollTop > state.offerScrollThreshold;
+    syncOfferStickyFields(scrollTop);
     syncFloatVisibility();
+    updateFooterVisibility(scrollTop);
+  }
+
+  function refreshOfferStickyLayout() {
+    if (!dom.offerStickyShell || !dom.offerStickyFields) return;
+    dom.offerStickyShell.style.minHeight = `${dom.offerStickyFields.offsetHeight}px`;
+  }
+
+  function syncOfferStickyFields(scrollTop) {
+    if (!dom.offerStickyShell || !dom.offerStickyFields) return;
+    const currentScrollTop =
+      typeof scrollTop === 'number' ? scrollTop : window.pageYOffset || document.documentElement.scrollTop || 0;
+    const canFloat = window.innerWidth > 768;
+    const shouldFloat = canFloat && currentScrollTop > state.offerStickyThreshold;
+
+    if (shouldFloat) {
+      const rect = dom.offerStickyShell.getBoundingClientRect();
+      dom.offerStickyFields.style.setProperty('--offer-sticky-left', `${Math.max(rect.left, 0)}px`);
+      dom.offerStickyFields.style.setProperty('--offer-sticky-width', `${rect.width}px`);
+      dom.offerStickyFields.classList.add('is-floating');
+    } else {
+      dom.offerStickyFields.classList.remove('is-floating');
+      dom.offerStickyFields.style.removeProperty('--offer-sticky-left');
+      dom.offerStickyFields.style.removeProperty('--offer-sticky-width');
+    }
+
+    refreshOfferStickyLayout();
+  }
+
+  function updateFooterVisibility(scrollTop) {
+    if (!dom.siteFooter) return;
+    const footerRect = dom.siteFooter.getBoundingClientRect();
+    const revealThreshold = window.innerHeight + FOOTER_REVEAL_DISTANCE;
+    dom.siteFooter.classList.toggle('is-visible', footerRect.top <= revealThreshold);
   }
 
   function updateChecklistScrollState() {
