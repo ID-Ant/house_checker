@@ -261,18 +261,27 @@
       'Size too small',
       'Requires painting',
       'Walls need work',
-      'Damage/Mould/Dew/leakage',
+      'Damage/Mold/Dew/leakage',
       'Wallpaper removal',
       'Skirting/fixture replacing',
       'Textured Ceiling',
       'Windows require replacing'
     ];
 
-    const row = document.createElement('div');
-    row.className = 'rooms-row';
-    roomsGrid.appendChild(row);
+    const createRow = () => {
+      const row = document.createElement('div');
+      row.className = 'rooms-row';
+      roomsGrid.appendChild(row);
+      return row;
+    };
+
+    let activeRow = createRow();
 
     for (let i = 0; i < roomCount; i += 1) {
+      if (roomCount > 3 && i === 3) {
+        activeRow = createRow();
+      }
+
       const roomFrame = document.createElement('div');
       roomFrame.className = 'room-frame';
 
@@ -307,7 +316,7 @@
       });
 
       roomFrame.appendChild(roomCheckboxGroup);
-      row.appendChild(roomFrame);
+      activeRow.appendChild(roomFrame);
     }
 
     refreshDeductionPills();

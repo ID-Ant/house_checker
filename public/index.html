@@ -3,59 +3,39 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>House Offer Calculator UK | Estimate a Fair Property Offer</title>
+    <title>House Negotiator | Fair Counter-Offer Calculator</title>
     <link rel="canonical" href="https://housenegotiator.co.uk/">
-    <meta name="description" content="Use House Negotiator to estimate a fair house offer in the UK using HM Land Registry market context, asking price comparison, and repair costs before you make a counter-offer.">
+    <meta name="description" content="Calculate a fair counter-offer using HM Land Registry data, local authority signals, and property condition costs with House Negotiator.">
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
-    <meta property="og:title" content="House Offer Calculator UK | Estimate a Fair Property Offer">
-    <meta property="og:description" content="Use House Negotiator to compare the asking price with HM Land Registry market context and repair costs before making a UK property offer.">
+    <meta property="og:title" content="House Negotiator | Fair Counter-Offer Calculator">
+    <meta property="og:description" content="Calculate a fair counter-offer using HM Land Registry data, local authority signals, and property condition costs.">
     <meta property="og:url" content="https://housenegotiator.co.uk/">
     <meta property="og:type" content="website">
-    <meta property="og:image" content="https://housenegotiator.co.uk/images/social-share.png">
-    <meta property="og:image:type" content="image/png">
+    <meta property="og:image" content="https://housenegotiator.co.uk/images/social-share.svg">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="House Negotiator social preview for the UK house offer calculator">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="House Offer Calculator UK | Estimate a Fair Property Offer">
-    <meta name="twitter:description" content="Use House Negotiator to compare the asking price with HM Land Registry market context and repair costs before making a UK property offer.">
-    <meta name="twitter:image" content="https://housenegotiator.co.uk/images/social-share.png">
-    <meta name="twitter:image:alt" content="House Negotiator social preview for the UK house offer calculator">
+    <meta name="twitter:title" content="House Negotiator | Fair Counter-Offer Calculator">
+    <meta name="twitter:description" content="Calculate a fair counter-offer using HM Land Registry data, local authority signals, and property condition costs.">
+    <meta name="twitter:image" content="https://housenegotiator.co.uk/images/social-share.svg">
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
         "@graph": [
           {
             "@type": "Organization",
-            "@id": "https://housenegotiator.co.uk/#organization",
             "name": "House Negotiator",
             "url": "https://housenegotiator.co.uk/",
-            "logo": {
-              "@type": "ImageObject",
-              "url": "https://housenegotiator.co.uk/images/social-share.png"
-            }
+            "logo": "https://housenegotiator.co.uk/images/social-share.svg"
           },
           {
             "@type": "WebSite",
-            "@id": "https://housenegotiator.co.uk/#website",
             "name": "House Negotiator",
             "url": "https://housenegotiator.co.uk/",
-            "publisher": {
-              "@id": "https://housenegotiator.co.uk/#organization"
-            }
-          },
-          {
-            "@type": "WebApplication",
-            "@id": "https://housenegotiator.co.uk/#webapp",
-            "name": "House Negotiator",
-            "url": "https://housenegotiator.co.uk/",
-            "applicationCategory": "FinanceApplication",
-            "operatingSystem": "Web",
-            "description": "A UK house offer calculator that compares asking prices with HM Land Registry market context and estimated repair costs.",
-            "image": "https://housenegotiator.co.uk/images/social-share.png",
-            "isAccessibleForFree": true,
-            "publisher": {
-              "@id": "https://housenegotiator.co.uk/#organization"
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": "https://housenegotiator.co.uk/?q={search_term_string}",
+              "query-input": "required name=search_term_string"
             }
           }
         ]
@@ -67,27 +47,18 @@
   <body>
     <header class="app-header">
       <div class="app-header__content">
-        <p class="eyebrow">House Negotiator</p>
-        <h1 class="hero-title"><span class="headline-highlight">House Offer Calculator for UK Buyers</span></h1>
-        <p class="disclaimer hero-summary">Estimate a fair house offer using sold-price data, local market context, and repair costs before you make a counter-offer.</p>
-        <p class="disclaimer">Use the calculator to compare the asking price with HM Land Registry averages, then factor in the cost of work needed at the property.</p>
-        <nav class="content-nav home-nav" aria-label="Site links">
-          <a href="/about/">About</a>
-          <a href="/what-should-i-offer-on-a-house/">What Should I Offer?</a>
-          <a href="/how-to-negotiate-house-price-uk/">How to Negotiate</a>
-          <a href="/how-it-works/">How It Works</a>
-          <a href="/faq/">FAQ</a>
-          <a href="/privacy/">Privacy</a>
-          <a href="/terms/">Terms</a>
-        </nav>
+        <p class="eyebrow">House Checker</p>
+        <h1><span class="headline-highlight">What is a fair price?</span></h1>
+        <p class="disclaimer">Take the guess work out. See historic Sale prices and caluclate a counter-offer</p>
+     <br>
       </div>
     </header>
     <main class="app-shell">
       <section class="panel panel--market" id="market-panel">
         <div class="panel__heading">
           <p class="eyebrow">Market pulse</p>
-          <h2>Compare the asking price with HM Land Registry averages</h2>
-          <p>Check how the asking price or your target offer compares with recent UK property price data for the local area and property type.</p>
+          <h2>Compare with Land Registry averages</h2>
+          <p>See how your asking or counter offer stacks up against the latest HM Land Registry snapshot.</p>
         </div>
         <div class="market-overlay" id="market-overlay">
           <div class="market-split">
@@ -184,34 +155,30 @@
       <section class="panel panel--offer">
         <div class="panel__heading deductible-heading">
           <p class="eyebrow">Counter-offer builder</p>
-          <h2>Build a data-backed property counter-offer</h2>
+          <h2>Keep pricing conversations fair</h2>
         </div>
-        <div class="offer-sticky-shell">
-          <div class="offer-sticky-fields">
-            <div class="offer-grid">
-              <div class="field-block">
-                <label class="input-label" for="currency">Asking Price</label>
-                <div class="currency-input">
-                  <span class="currency-prefix" aria-hidden="true">£</span>
-                  <input id="currency" type="text" inputmode="numeric" autocomplete="off" oninput="formatCurrency(this)">
-                </div>
-                <p class="helper-text">Enter the advertised price or the seller's guide price.</p>
-              </div>
-              <div class="field-block">
-                <label class="input-label" for="totalPoints">Counter Offer</label>
-                <div class="currency-input currency-input--readonly">
-                  <span class="currency-prefix" aria-hidden="true">£</span>
-                  <input id="totalPoints" type="text" disabled>
-                </div>
-                <p class="helper-text">Updates automatically as you add repairs, defects, and improvements.</p>
-              </div>
+        <div class="offer-grid">
+          <div class="field-block">
+            <label class="input-label" for="currency">Asking Price</label>
+            <div class="currency-input">
+              <span class="currency-prefix" aria-hidden="true">£</span>
+              <input id="currency" type="text" inputmode="numeric" autocomplete="off" oninput="formatCurrency(this)">
             </div>
+            <p class="helper-text">Based on the listing or vendor guidance.</p>
+          </div>
+          <div class="field-block">
+            <label class="input-label" for="totalPoints">Counter Offer</label>
+            <div class="currency-input currency-input--readonly">
+              <span class="currency-prefix" aria-hidden="true">£</span>
+              <input id="totalPoints" type="text" disabled>
+            </div>
+            <p class="helper-text">Automatically updates as you select issues.</p>
           </div>
         </div>
         <div class="alert alert--muted is-hidden" id="offer-status" role="status" aria-live="polite"></div>
         <div class="share-card">
           <p class="eyebrow">Share or revisit later</p>
-          <p class="helper-text">Generate a link that reloads your location, asking price, and selected repair items.</p>
+          <p class="helper-text">Generate a link that reloads your region, price and selected work items.</p>
           <div class="share-actions">
             <button class="button button--primary" type="button" id="share-link-btn">Copy shareable link</button>
             <input class="input-control input-control--readonly" type="text" id="share-link-output" readonly aria-live="polite" placeholder="Link will appear here">
@@ -220,37 +187,11 @@
         </div>
       </section>
 
-      <section class="panel">
-        <div class="panel__heading">
-          <p class="eyebrow">Offer research</p>
-          <h2>Use the calculator alongside practical house-offer guidance</h2>
-          <p>House Negotiator is designed to help UK buyers estimate a fair property offer before speaking to the estate agent. The strongest offer strategy usually comes from combining the calculator with sold-price context, realistic repair costs, and a clear negotiation plan.</p>
-          <p>If you are still deciding what to offer on a house in the UK, start by reviewing the asking price against local evidence, then use the calculator to sense-check how visible work should affect your number.</p>
-        </div>
-        <div class="content-columns">
-          <article class="content-card">
-            <h3>What should I offer on a house?</h3>
-            <p>Use sold-price evidence, time-on-market clues, and repair costs to work out a realistic opening offer instead of relying on a flat percentage below asking.</p>
-            <p><a href="/what-should-i-offer-on-a-house/">Read the UK house-offer guide</a></p>
-          </article>
-          <article class="content-card">
-            <h3>How should I negotiate house price?</h3>
-            <p>Learn how to justify a lower number, when to make a counter-offer, and how to present your position clearly to the estate agent.</p>
-            <p><a href="/how-to-negotiate-house-price-uk/">Read the house-price negotiation guide</a></p>
-          </article>
-        </div>
-        <div class="content-card content-callout">
-          <h3>Why this approach gives buyers a stronger position</h3>
-          <p>A house offer calculator is most useful when it supports a real buying decision. Comparing the asking price with HM Land Registry context can help you see whether the property looks fairly priced, while repair costs can show whether the guide price still makes sense once the condition of the home is taken into account.</p>
-          <p>That combination gives you a more defensible starting point if you need to make an opening bid, explain a lower offer, or prepare a counter-offer on a house that needs work.</p>
-        </div>
-      </section>
-
       <section class="panel panel--checklist" data-deductions="true">
         <div class="panel__heading">
           <p class="eyebrow">Property condition</p>
-          <h2>Add repair and improvement costs</h2>
-          <p>Start with the preset property repair costs, then adjust any item to better reflect the condition of the home you are assessing.</p>
+          <h2>Tick the work that’s needed</h2>
+          <p>We have set predefined costs again each condition/element, but you can amend but clicking the price next to each.</p>
         </div>
         <div class="condition-scroller" id="deduction-list">
           <div class="checkbox-group" data-section="Garden">
@@ -301,7 +242,7 @@
               <label data-label="Full Kitchen refurbishment"><input id="kitchen1" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Full Kitchen refurbishment</span><span class="deduction-pill" aria-live="polite"></span></label>
               <label data-label="Minor Kitchen refurbishment"><input id="kitchen2" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Minor Kitchen refurbishment</span><span class="deduction-pill" aria-live="polite"></span></label>
               <label data-label="Damaged Walls / Repair Required"><input id="kitchen3" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Damaged Walls / Repair Required</span><span class="deduction-pill" aria-live="polite"></span></label>
-              <label data-label="Damp/Mould/Dew"><input id="kitchen4" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Damp/Mould/Dew</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Damp/Mold/Dew"><input id="kitchen4" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Damp/Mold/Dew</span><span class="deduction-pill" aria-live="polite"></span></label>
               <label data-label="Rubble/Junk removal required"><input id="kitchen5" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Rubble/Junk removal required</span><span class="deduction-pill" aria-live="polite"></span></label>
               <label data-label="Not enough counter space"><input id="kitchen6" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Not enough counter space</span><span class="deduction-pill" aria-live="polite"></span></label>
               <label data-label="Not enough storage"><input id="kitchen7" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Not enough storage</span><span class="deduction-pill" aria-live="polite"></span></label>
@@ -318,7 +259,7 @@
               <label data-label="Full Lounge refurbishment"><input id="lounge1" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Full Lounge refurbishment</span><span class="deduction-pill" aria-live="polite"></span></label>
               <label data-label="Minor Lounge refurbishment"><input id="lounge2" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Minor Lounge refurbishment</span><span class="deduction-pill" aria-live="polite"></span></label>
               <label data-label="Damaged Walls / Repair Required"><input id="lounge3" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Damaged Walls / Repair Required</span><span class="deduction-pill" aria-live="polite"></span></label>
-              <label data-label="Damp/Mould/Dew"><input id="lounge4" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Damp/Mould/Dew</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Damp/Mold/Dew"><input id="lounge4" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Damp/Mold/Dew</span><span class="deduction-pill" aria-live="polite"></span></label>
               <label data-label="Repaint required"><input id="lounge5" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Repaint required</span><span class="deduction-pill" aria-live="polite"></span></label>
               <label data-label="Damage"><input id="lounge6" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Damage</span><span class="deduction-pill" aria-live="polite"></span></label>
               <label data-label="Textured Ceiling"><input id="lounge7" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Textured Ceiling</span><span class="deduction-pill" aria-live="polite"></span></label>
@@ -334,7 +275,7 @@
               <label data-label="Full Toilet refurbishment"><input id="toilet1" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Full Toilet refurbishment</span><span class="deduction-pill" aria-live="polite"></span></label>
               <label data-label="Minor Toilet refurbishment"><input id="toilet2" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Minor Toilet refurbishment</span><span class="deduction-pill" aria-live="polite"></span></label>
               <label data-label="Damaged Walls / Repair Required"><input id="toilet3" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Damaged Walls / Repair Required</span><span class="deduction-pill" aria-live="polite"></span></label>
-              <label data-label="Damp/Mould/Dew"><input id="toilet4" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Damp/Mould/Dew</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Damp/Mold/Dew"><input id="toilet4" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Damp/Mold/Dew</span><span class="deduction-pill" aria-live="polite"></span></label>
               <label data-label="Repaint required"><input id="toilet5" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Repaint required</span><span class="deduction-pill" aria-live="polite"></span></label>
               <label data-label="Damage"><input id="toilet6" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Damage</span><span class="deduction-pill" aria-live="polite"></span></label>
               <label data-label="Textured Ceiling"><input id="toilet7" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Textured Ceiling</span><span class="deduction-pill" aria-live="polite"></span></label>
@@ -359,7 +300,7 @@
             <div class="checkbox-row">
               <label data-label="Stairs require work"><input id="stairwell1" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Stairs require work</span><span class="deduction-pill" aria-live="polite"></span></label>
               <label data-label="Damaged Walls / Repair Required"><input id="stairwell2" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Damaged Walls / Repair Required</span><span class="deduction-pill" aria-live="polite"></span></label>
-              <label data-label="Damp/Mould/Dew"><input id="stairwell3" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Damp/Mould/Dew</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Damp/Mold/Dew"><input id="stairwell3" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Damp/Mold/Dew</span><span class="deduction-pill" aria-live="polite"></span></label>
               <label data-label="Repaint required"><input id="stairwell4" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Repaint required</span><span class="deduction-pill" aria-live="polite"></span></label>
               <label data-label="Textured Ceiling"><input id="stairwell5" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Textured Ceiling</span><span class="deduction-pill" aria-live="polite"></span></label>
               <label data-label="Wallpaper removal"><input id="stairwell6" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Wallpaper removal</span><span class="deduction-pill" aria-live="polite"></span></label>
@@ -372,7 +313,7 @@
             <div class="checkbox-row">
               <label data-label="Facias require replacing"><input id="exterior1" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Facias require replacing</span><span class="deduction-pill" aria-live="polite"></span></label>
               <label data-label="Damaged Roof / Repair Required"><input id="exterior2" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Damaged Roof / Repair Required</span><span class="deduction-pill" aria-live="polite"></span></label>
-              <label data-label="Damp/Mould/Dew"><input id="exterior3" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Damp/Mould/Dew</span><span class="deduction-pill" aria-live="polite"></span></label>
+              <label data-label="Damp/Mold/Dew"><input id="exterior3" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Damp/Mold/Dew</span><span class="deduction-pill" aria-live="polite"></span></label>
               <label data-label="Repaint required"><input id="exterior4" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Repaint required</span><span class="deduction-pill" aria-live="polite"></span></label>
               <label data-label="No Driveway"><input id="exterior5" type="checkbox" onchange="updateTotal(this)"><span class="label-text">No Driveway</span><span class="deduction-pill" aria-live="polite"></span></label>
               <label data-label="Driveway too small for required cars"><input id="exterior6" type="checkbox" onchange="updateTotal(this)"><span class="label-text">Driveway too small for required cars</span><span class="deduction-pill" aria-live="polite"></span></label>
@@ -425,34 +366,6 @@
         <p class="metric-meta" id="market-counter-meta-floating">—</p>
       </div>
     </div>
-
-    <footer class="site-footer">
-      <div class="site-footer__inner">
-        <section class="site-footer__card">
-          <p class="eyebrow">Trust</p>
-          <h2>Clear routes for buyers</h2>
-          <p>House Negotiator uses HM Land Registry context, visible repair inputs, and shareable links to help buyers prepare a more informed starting offer.</p>
-          <p>Project feedback and issue tracking are available on <a href="https://github.com/ID-Ant/house_checker">GitHub</a>.</p>
-        </section>
-        <section class="site-footer__card">
-          <p class="eyebrow">Explore</p>
-          <div class="site-footer__links">
-            <a href="/about/">About</a>
-            <a href="/what-should-i-offer-on-a-house/">What Should I Offer?</a>
-            <a href="/how-to-negotiate-house-price-uk/">How to Negotiate</a>
-            <a href="/how-it-works/">How It Works</a>
-            <a href="/faq/">FAQ</a>
-          </div>
-        </section>
-        <section class="site-footer__card">
-          <p class="eyebrow">Policies</p>
-          <div class="site-footer__links">
-            <a href="/privacy/">Privacy</a>
-            <a href="/terms/">Terms</a>
-          </div>
-        </section>
-      </div>
-    </footer>
 
     <div class="modal" id="land-registry-modal" aria-hidden="true" aria-modal="true" role="dialog" aria-labelledby="land-registry-modal-title">
       <div class="modal__overlay" id="land-registry-overlay" role="presentation" data-modal-dismiss></div>
